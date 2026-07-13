@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Dashboard – Deepshikha Digital</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <div class="d-flex dashboard-shell">
+    <!-- Sidebar -->
+    <nav class="flex-shrink-0 p-3 border-end min-vh-100 sidebar">
+      <a href="dashboard.html" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-decoration-none sidebar-brand">
+        <span class="brand-badge me-2">DD</span>
+        <span class="fs-6 fw-bold">Deepshikha</span>
+      </a>
+      <hr />
+      <ul class="nav nav-pills flex-column mb-auto small">
+        <li class="nav-item">
+          <a href="dashboard.html" class="nav-link">
+            Dashboard
+          </a>
+        </li>
+        <li>
+          <a href="orders-list.html" class="nav-link">Orders</a>
+        </li>
+        <li>
+          <a href="sample-orders.html" class="nav-link">Sample Orders</a>
+        </li>
+        <li>
+          <a href="store-locator.html" class="nav-link">Store Locator</a>
+        </li>
+        <li>
+          <a href="users.html" class="nav-link">Users</a>
+        </li>
+        <li>
+          <a href="resources.html" class="nav-link">Resources</a>
+        </li>
+        <li>
+          <a href="careers.html" class="nav-link">Careers / Job Requests</a>
+        </li>
+        <li>
+          <a href="conditions.html" class="nav-link">Conditions</a>
+        </li>
+      </ul>
+      <hr />
+      <div class="dropdown">
+        <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle small" data-bs-toggle="dropdown">
+          <span class="me-2 avatar-circle">A</span>
+          <strong>Admin User</strong>
+        </a>
+        <ul class="dropdown-menu text-small shadow">
+          <li><a class="dropdown-item" href="#">Profile</a></li>
+          <li><a class="dropdown-item" href="#">Settings</a></li>
+          <li><hr class="dropdown-divider" /></li>
+          <li><a class="dropdown-item" href="login.html">Sign out</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Main content -->
+    <main class="p-4 flex-grow-1 main-panel">
+
+      <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+          <h1 class="h4 fw-bold mb-1">Dashboard</h1>
+          <p class="small text-muted mb-0">Clean admin screens with child‑friendly accents.</p>
+        </div>
+        <span class="badge bg-primary-subtle text-primary">Prototype UI – static data</span>
+      </div>
+
+      <div class="row g-3 mb-4">
+        <div class="col-md-3">
+          <div class="card border-0 shadow-sm rounded-4 stat-card">
+            <div class="card-body">
+              <div class="small text-muted">Today’s Orders</div>
+              <div class="fs-4 fw-bold">128</div>
+              <div class="small text-success">+12 vs yesterday</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card border-0 shadow-sm rounded-4 stat-card">
+            <div class="card-body">
+              <div class="small text-muted">Pending Acks</div>
+              <div class="fs-4 fw-bold">9</div>
+              <div class="small text-danger">Action needed</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card border-0 shadow-sm rounded-4 stat-card">
+            <div class="card-body">
+              <div class="small text-muted">Sample Orders</div>
+              <div class="fs-4 fw-bold">32</div>
+              <div class="small text-muted">This month</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card border-0 shadow-sm rounded-4 stat-card">
+            <div class="card-body">
+              <div class="small text-muted">Job Requests</div>
+              <div class="fs-4 fw-bold">5</div>
+              <div class="small text-muted">Awaiting review</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+            <h2 class="h6 mb-0">Recent Orders</h2>
+            <div class="d-flex gap-2">
+              <input type="text" class="form-control form-control-sm" placeholder="Search school / city" />
+              <a href="orders-list.html" class="btn btn-sm btn-outline-primary rounded-pill">View all</a>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Order No.</th>
+                  <th>School / Partner</th>
+                  <th>City</th>
+                  <th>Status</th>
+                  <th>Invoice</th>
+                  <th>Updated</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><a href="order-booking.html">ORD-2025-00123</a></td>
+                  <td>ABC Public School</td>
+                  <td>Delhi</td>
+                  <td><span class="badge bg-success-subtle text-success">Processed</span></td>
+                  <td><a href="invoice.html">Download</a></td>
+                  <td>09 Dec 2025</td>
+                </tr>
+                <tr>
+                  <td><a href="order-booking.html">ORD-2025-00124</a></td>
+                  <td>XYZ International</td>
+                  <td>Mumbai</td>
+                  <td><span class="badge bg-warning-subtle text-warning">Pending Ack.</span></td>
+                  <td>—</td>
+                  <td>09 Dec 2025</td>
+                </tr>
+                <tr>
+                  <td><a href="order-booking.html">ORD-2025-00125</a></td>
+                  <td>Sample Distributor</td>
+                  <td>Jaipur</td>
+                  <td><span class="badge bg-primary-subtle text-primary">In Process</span></td>
+                  <td><a href="invoice.html">Preview</a></td>
+                  <td>08 Dec 2025</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-lg-6">
+          <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body">
+              <h2 class="h6 mb-3">Quick Store Lookup</h2>
+              <form class="row g-2 small">
+                <div class="col-md-4">
+                  <label class="form-label">State</label>
+                  <select class="form-select form-select-sm">
+                    <option>All</option>
+                    <option>Delhi</option>
+                    <option>Maharashtra</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">City</label>
+                  <input type="text" class="form-control form-control-sm" />
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                  <button class="btn btn-sm btn-outline-primary rounded-pill w-100" type="button">
+                    Search
+                  </button>
+                </div>
+              </form>
+              <p class="small text-muted mt-3 mb-0">
+                This mirrors the state / city / vendor screens – connect to your store database.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body">
+              <h2 class="h6 mb-3">Job Requests Snapshot</h2>
+              <ul class="list-group list-group-flush small">
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <span>Sales Executive – Delhi</span>
+                  <span class="badge bg-info-subtle text-info">New</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <span>Academic Coordinator – Jaipur</span>
+                  <span class="badge bg-secondary-subtle text-secondary">In Review</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <span>Business Associate – Lucknow</span>
+                  <span class="badge bg-success-subtle text-success">Shortlisted</span>
+                </li>
+              </ul>
+              <p class="small text-muted mt-3 mb-0">
+                The full job request list (with no delete without acknowledgement) is in the Careers module.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
