@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Books at Doorsteps — Online Book Bazaar</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --dd-primary: #4f46e5;
+    --dd-primary-soft: #eef2ff;
+    --dd-pink: #fb7185;
+    --dd-yellow: #facc15;
+    --dd-bg-soft: #f4f5fb;
+  }
+  * { box-sizing: border-box; }
+  body { font-family: "Nunito", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+  .hero-section {
+    background: radial-gradient(circle at top left, #fef3c7, transparent 55%),
+      radial-gradient(circle at bottom right, #e0f2fe, transparent 55%);
+  }
+  .brand-badge {
+    width: 32px; height: 32px; border-radius: 999px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 0.85rem;
+    background: linear-gradient(135deg, #4f46e5, #fb7185); color: white;
+  }
+  .tag-pill {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 0.25rem 0.75rem; border-radius: 999px;
+    background-color: #eef2ff; color: #4f46e5; font-size: 0.78rem; font-weight: 700;
+  }
+  .tag-pill.foreign { background-color: #fce7f3; color: #db2777; }
+  .book-card { border-radius: 1.25rem; transition: transform .15s ease; }
+  .book-card:hover { transform: translateY(-3px); }
+  .book-cover {
+    aspect-ratio: 3/4; background: var(--dd-primary-soft); border-radius: 1rem 1rem 0 0;
+    display: flex; align-items: center; justify-content: center; overflow: hidden;
+  }
+  .book-cover img { width: 100%; height: 100%; object-fit: cover; }
+  .price-orig { text-decoration: line-through; color: #9ca3af; font-size: .85rem; }
+  .price-now { color: var(--dd-primary); font-weight: 800; font-size: 1.15rem; }
+  .nav-pill { border-radius: 999px; }
+  .status-pending { background-color: #fef9c3; color: #854d0e; }
+  .status-approved { background-color: #dcfce7; color: #15803d; }
+  .status-rejected { background-color: #fee2e2; color: #b91c1c; }
+  .view { display: none; }
+  .view.active { display: block; }
+  .admin-row:hover { background-color: #f9fafb; }
+  footer { background: #111827; color: #d1d5db; }
+  .locked-banner { background: #fff7ed; border: 1px solid #fed7aa; color: #9a3412; border-radius: 1rem; padding: 1rem 1.25rem; }
+</style>
+</head>
+<body>
+
+<!-- Top Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+  <div class="container">
+    <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="#" onclick="showView('browse')">
+      <span class="brand-badge">BD</span>
+      <span>Books at <span class="text-primary">Doorsteps</span></span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="mainNav">
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-2 align-items-lg-center">
+        <li class="nav-item"><a class="nav-link nav-pill px-3" href="#" onclick="showView('browse')">Browse Books</a></li>
+        <li class="nav-item"><a class="nav-link nav-pill px-3" href="#" onclick="showView('contact')">Contact Us</a></li>
+        <li class="nav-item" id="navAccount"><a class="nav-link nav-pill px-3" href="#" onclick="showView('account')">My Account</a></li>
+        <li class="nav-item" id="navAdmin" style="display:none;"><a class="nav-link nav-pill px-3 text-muted small" href="#" onclick="showView('admin')">Admin</a></li>
+        <li class="nav-item" id="navAuth"><a class="btn btn-primary rounded-pill px-3" href="#" onclick="showView('login')">Log In / Sign Up</a></li>
+        <li class="nav-item" id="navLogout" style="display:none;"><a class="btn btn-outline-secondary rounded-pill px-3" href="#" onclick="doLogout()">Log Out</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- BROWSE VIEW -->
+<div id="view-browse" class="view active">
+  <section class="hero-section py-5">
+    <div class="container text-center">
+      <p class="text-uppercase small fw-bold mb-2" style="letter-spacing:.15em;color:#6b7280;">Quality-checked · Curated · Best prices</p>
+      <h1 class="display-6 fw-bold mb-3">Your one-stop online book bazaar</h1>
+      <p class="lead text-muted mb-4">Browse books from vetted Indian and foreign publishers, at prices better than retail.</p>
+      <input id="searchBox" type="text" class="form-control form-control-lg mx-auto shadow-sm" style="max-width:480px;border-radius:999px;" placeholder="Search books, publishers, categories…">
+    </div>
+  </section>
+  <div class="container py-4">
+    <div class="d-flex flex-wrap gap-2 mb-4" id="filterRow"></div>
+    <div class="row g-4" id="bookGrid"></div>
+    <div id="emptyState" class="text-center text-muted py-5" style="display:none;">
+      <p class="fs-5">No books yet in this category.</p>
+      <p class="small">Check back soon, or <a href="#" onclick="showView(currentUser ? 'account' : 'login')">log in to request a title</a>.</p>
+    </div>
+  </div>
+</div>
+
+<!-- CONTACT US VIEW (open to all, no login) -->
+<div id="view-contact" class="view">
+  <div class="container py-5" style="max-width:640px;">
+    <h2 class="fw-bold mb-2">Get in touch</h2>
+    <p class="text-muted mb-4">Have a question, or want to know more before signing up? Send us a message — no account needed.</p>
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-body p-4">
+        <form id="contactForm" onsubmit="submitContact(event)">
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Your name</label>
+            <input required class="form-control" id="c_name">
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label small fw-semibold">Email</label>
+              <input type="email" class="form-control" id="c_email">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label small fw-semibold">Phone</label>
+              <input class="form-control" id="c_phone">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Message</label>
+            <textarea required class="form-control" rows="4" id="c_message"></textarea>
+          </div>
+          <button class="btn btn-primary rounded-pill px-4" type="submit">Send</button>
+        </form>
+        <div id="contactSuccess" class="alert alert-success rounded-3 mt-3" style="display:none;">
+          Thanks — we'll get back to you shortly. You can also reach us directly at
+          <strong>support@booksatdoorsteps.com</strong> or WhatsApp <strong>+91 95559 87368</strong>.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LOGIN / SIGNUP VIEW -->
+<div id="view-login" class="view">
+  <div class="container py-5" style="max-width:480px;">
+    <ul class="nav nav-pills justify-content-center mb-4 gap-2" id="authTabs">
+      <li class="nav-item"><button class="btn btn-primary rounded-pill px-4" id="tabLoginBtn" onclick="switchAuthTab('login')">Log In</button></li>
+      <li class="nav-item"><button class="btn btn-outline-primary rounded-pill px-4" id="tabSignupBtn" onclick="switchAuthTab('signup')">Sign Up</button></li>
+    </ul>
+
+    <div id="loginPane" class="card border-0 shadow-sm rounded-4">
+      <div class="card-body p-4">
+        <form onsubmit="doLogin(event)">
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Email</label>
+            <input required type="email" class="form-control" id="li_email">
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Password</label>
+            <input required type="password" class="form-control" id="li_password">
+          </div>
+          <button class="btn btn-primary rounded-pill w-100" type="submit">Log In</button>
+        </form>
+        <div id="loginError" class="text-danger small mt-2"></div>
+      </div>
+    </div>
+
+    <div id="signupPane" class="card border-0 shadow-sm rounded-4" style="display:none;">
+      <div class="card-body p-4">
+        <form onsubmit="doSignup(event)">
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">I am signing up as</label>
+            <select class="form-select" id="su_category">
+              <option value="publisher">Publisher</option>
+              <option value="school">School</option>
+              <option value="institution">Institution / Library</option>
+              <option value="individual">Individual</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Full name</label>
+            <input required class="form-control" id="su_name">
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Organisation <span class="text-muted fw-normal">(if applicable)</span></label>
+            <input class="form-control" id="su_org">
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Phone</label>
+            <input class="form-control" id="su_phone">
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Email</label>
+            <input required type="email" class="form-control" id="su_email">
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Password</label>
+            <input required type="password" minlength="6" class="form-control" id="su_password">
+          </div>
+          <button class="btn btn-primary rounded-pill w-100" type="submit">Create Account</button>
+        </form>
+        <div id="signupError" class="text-danger small mt-2"></div>
+        <div id="signupSuccess" class="alert alert-success rounded-3 mt-3" style="display:none;">
+          Account created! Check your email to confirm, then log in.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MY ACCOUNT VIEW (members only) -->
+<div id="view-account" class="view">
+  <div class="container py-5" style="max-width:680px;">
+    <div id="accountLocked" class="locked-banner" style="display:none;">
+      Please <a href="#" onclick="showView('login')">log in or sign up</a> to request a book, list your titles, or view your activity.
+    </div>
+
+    <div id="accountContent" style="display:none;">
+      <h2 class="fw-bold mb-1">My Account</h2>
+      <p class="text-muted mb-4" id="accountWelcome"></p>
+
+      <!-- Publisher: list a book -->
+      <div id="publisherPanel" style="display:none;">
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+          <div class="card-body p-4">
+            <h5 class="fw-bold mb-3">List a new book</h5>
+            <form id="publisherForm" onsubmit="submitListing(event)">
+              <div class="mb-3">
+                <label class="form-label small fw-semibold">Book title</label>
+                <input required class="form-control" id="pub_title">
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label small fw-semibold">Category</label>
+                  <input class="form-control" id="pub_category">
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label small fw-semibold">Origin</label>
+                  <select class="form-select" id="pub_origin">
+                    <option value="Indian">Indian</option>
+                    <option value="Foreign">Foreign</option>
+                  </select>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label small fw-semibold">MRP (₹)</label>
+                  <input type="number" class="form-control" id="pub_mrp">
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label small fw-semibold">Offer price (₹)</label>
+                  <input type="number" class="form-control" id="pub_price">
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label small fw-semibold">Cover image URL</label>
+                <input class="form-control" id="pub_image" placeholder="https://…">
+              </div>
+              <div class="mb-3">
+                <label class="form-label small fw-semibold">Description</label>
+                <textarea class="form-control" rows="3" id="pub_desc"></textarea>
+              </div>
+              <button class="btn btn-primary rounded-pill px-4" type="submit">Submit for Review</button>
+            </form>
+            <div id="publisherSuccess" class="alert alert-success rounded-3 mt-3" style="display:none;">
+              Submitted — pending our review against marketplace norms.
+            </div>
+          </div>
+        </div>
+        <h5 class="fw-bold mb-3">Your submissions</h5>
+        <div class="table-responsive">
+          <table class="table align-middle bg-white rounded-4 overflow-hidden shadow-sm">
+            <thead class="table-light"><tr><th>Title</th><th>Price</th><th>Status</th></tr></thead>
+            <tbody id="myListingsBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Buyer: request a book -->
+      <div id="buyerPanel" style="display:none;">
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+          <div class="card-body p-4">
+            <h5 class="fw-bold mb-3">Request a book</h5>
+            <form id="requestForm" onsubmit="submitRequest(event)">
+              <div class="mb-3">
+                <label class="form-label small fw-semibold">Book title (author/ISBN if known)</label>
+                <input required class="form-control" id="req_title">
+              </div>
+              <div class="mb-3">
+                <label class="form-label small fw-semibold">Notes</label>
+                <textarea class="form-control" rows="3" id="req_notes" placeholder="Quantity, edition, deadline, etc."></textarea>
+              </div>
+              <button class="btn btn-primary rounded-pill px-4" type="submit">Submit Request</button>
+            </form>
+            <div id="requestSuccess" class="alert alert-success rounded-3 mt-3" style="display:none;">
+              Request received — we'll get back to you.
+            </div>
+          </div>
+        </div>
+        <h5 class="fw-bold mb-3">Your requests</h5>
+        <div class="table-responsive">
+          <table class="table align-middle bg-white rounded-4 overflow-hidden shadow-sm">
+            <thead class="table-light"><tr><th>Book</th><th>Notes</th><th>Status</th></tr></thead>
+            <tbody id="myRequestsBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN VIEW -->
+<div id="view-admin" class="view">
+  <div class="container py-5">
+    <h2 class="fw-bold mb-4">Review Queue</h2>
+    <h3 class="h6 fw-bold mb-3">Pending Publisher Listings</h3>
+    <div class="table-responsive mb-5">
+      <table class="table align-middle bg-white rounded-4 overflow-hidden shadow-sm">
+        <thead class="table-light"><tr><th>Book</th><th>Origin</th><th>Price</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody id="adminListingsBody"></tbody>
+      </table>
+    </div>
+    <h3 class="h6 fw-bold mb-3">Book Requests</h3>
+    <div class="table-responsive mb-5">
+      <table class="table align-middle bg-white rounded-4 overflow-hidden shadow-sm">
+        <thead class="table-light"><tr><th>Book</th><th>Notes</th><th>Status</th></tr></thead>
+        <tbody id="adminRequestsBody"></tbody>
+      </table>
+    </div>
+    <h3 class="h6 fw-bold mb-3">Contact Messages</h3>
+    <div class="table-responsive">
+      <table class="table align-middle bg-white rounded-4 overflow-hidden shadow-sm">
+        <thead class="table-light"><tr><th>Name</th><th>Contact</th><th>Message</th><th>Received</th></tr></thead>
+        <tbody id="adminContactBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<footer class="py-4 mt-5">
+  <div class="container d-flex flex-wrap justify-content-between align-items-center gap-2 small">
+    <span>© Books at Doorsteps</span>
+    <span>support@booksatdoorsteps.com · WhatsApp +91 95559 87368</span>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ============ CONFIG ============ */
+const SUPABASE_URL = "https://ebmzkpcujwwnqagbthby.supabase.co";
+const SUPABASE_KEY = "sb_publishable_mPwZfvEi6rZJ_TEHJ-qlUw_uxLpeZWZ";
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let currentUser = null;
+let currentProfile = null;
+
+/* ============ VIEW SWITCHING ============ */
+function showView(name){
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  if(name === 'browse') renderBrowse();
+  if(name === 'account') renderAccount();
+  if(name === 'admin') renderAdmin();
+}
+
+function switchAuthTab(tab){
+  document.getElementById('loginPane').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('signupPane').style.display = tab === 'signup' ? 'block' : 'none';
+  document.getElementById('tabLoginBtn').className = 'btn ' + (tab==='login' ? 'btn-primary' : 'btn-outline-primary') + ' rounded-pill px-4';
+  document.getElementById('tabSignupBtn').className = 'btn ' + (tab==='signup' ? 'btn-primary' : 'btn-outline-primary') + ' rounded-pill px-4';
+}
+
+/* ============ AUTH ============ */
+async function refreshSession(){
+  const { data: { session } } = await sb.auth.getSession();
+  currentUser = session ? session.user : null;
+  if(currentUser){
+    const { data: profile } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
+    currentProfile = profile;
+  } else {
+    currentProfile = null;
+  }
+  updateNav();
+}
+
+function updateNav(){
+  document.getElementById('navAuth').style.display = currentUser ? 'none' : 'block';
+  document.getElementById('navLogout').style.display = currentUser ? 'block' : 'none';
+  document.getElementById('navAdmin').style.display = (currentProfile && currentProfile.is_admin) ? 'block' : 'none';
+}
+
+async function doSignup(e){
+  e.preventDefault();
+  const email = document.getElementById('su_email').value;
+  const password = document.getElementById('su_password').value;
+  const category = document.getElementById('su_category').value;
+  const full_name = document.getElementById('su_name').value;
+  const organisation = document.getElementById('su_org').value;
+  const phone = document.getElementById('su_phone').value;
+
+  document.getElementById('signupError').textContent = '';
+  const { data, error } = await sb.auth.signUp({ email, password });
+  if(error){ document.getElementById('signupError').textContent = error.message; return; }
+
+  if(data.user){
+    await sb.from('profiles').insert({
+      id: data.user.id, category, full_name, organisation, phone
+    });
+  }
+  document.getElementById('signupSuccess').style.display = 'block';
+  document.getElementById('publisherForm') && null;
+  e.target.reset();
+}
+
+async function doLogin(e){
+  e.preventDefault();
+  const email = document.getElementById('li_email').value;
+  const password = document.getElementById('li_password').value;
+  document.getElementById('loginError').textContent = '';
+  const { error } = await sb.auth.signInWithPassword({ email, password });
+  if(error){ document.getElementById('loginError').textContent = error.message; return; }
+  await refreshSession();
+  showView('account');
+}
+
+async function doLogout(){
+  await sb.auth.signOut();
+  await refreshSession();
+  showView('browse');
+}
+
+/* ============ BROWSE (public) ============ */
+let activeCategory = null;
+async function renderBrowse(){
+  const q = (document.getElementById('searchBox').value || '').toLowerCase();
+  let query = sb.from('listings').select('*').eq('status', 'approved');
+  const { data: listings, error } = await query;
+  const grid = document.getElementById('bookGrid');
+  const empty = document.getElementById('emptyState');
+
+  const all = listings || [];
+  const cats = Array.from(new Set(all.map(b => b.category).filter(Boolean)));
+  const filterRow = document.getElementById('filterRow');
+  filterRow.innerHTML = '';
+  const allBtn = document.createElement('button');
+  allBtn.className = 'btn btn-sm ' + (activeCategory === null ? 'btn-primary' : 'btn-outline-secondary') + ' rounded-pill';
+  allBtn.textContent = 'All';
+  allBtn.onclick = () => { activeCategory = null; renderBrowse(); };
+  filterRow.appendChild(allBtn);
+  cats.forEach(c => {
+    const b = document.createElement('button');
+    b.className = 'btn btn-sm ' + (activeCategory === c ? 'btn-primary' : 'btn-outline-secondary') + ' rounded-pill';
+    b.textContent = c;
+    b.onclick = () => { activeCategory = c; renderBrowse(); };
+    filterRow.appendChild(b);
+  });
+
+  let list = all.filter(b => {
+    if(activeCategory && b.category !== activeCategory) return false;
+    if(q && !(b.title.toLowerCase().includes(q) || (b.category||'').toLowerCase().includes(q))) return false;
+    return true;
+  });
+
+  grid.innerHTML = '';
+  empty.style.display = list.length === 0 ? 'block' : 'none';
+
+  list.forEach(b => {
+    const col = document.createElement('div');
+    col.className = 'col-6 col-md-4 col-lg-3';
+    col.innerHTML = `
+      <div class="card h-100 border-0 shadow-sm book-card">
+        <div class="book-cover">
+          ${b.image_url ? `<img src="${b.image_url}" alt="${b.title}">` : `<span class="text-muted small px-3 text-center">${b.title}</span>`}
+        </div>
+        <div class="card-body">
+          <div class="mb-2"><span class="tag-pill ${b.origin === 'Foreign' ? 'foreign' : ''}">${b.origin === 'Foreign' ? '🌍 Foreign' : '🇮🇳 Indian'}</span></div>
+          <h6 class="fw-bold mb-2">${b.title}</h6>
+          <div class="d-flex align-items-baseline gap-2">
+            <span class="price-now">₹${b.price}</span>
+            ${b.mrp && b.mrp != b.price ? `<span class="price-orig">₹${b.mrp}</span>` : ''}
+          </div>
+        </div>
+      </div>`;
+    grid.appendChild(col);
+  });
+}
+document.getElementById('searchBox').addEventListener('input', renderBrowse);
+
+/* ============ CONTACT (public, no login) ============ */
+async function submitContact(e){
+  e.preventDefault();
+  await sb.from('contact_requests').insert({
+    name: document.getElementById('c_name').value,
+    email: document.getElementById('c_email').value,
+    phone: document.getElementById('c_phone').value,
+    message: document.getElementById('c_message').value
+  });
+  document.getElementById('contactForm').reset();
+  document.getElementById('contactSuccess').style.display = 'block';
+}
+
+/* ============ MY ACCOUNT (members only) ============ */
+async function renderAccount(){
+  if(!currentUser || !currentProfile){
+    document.getElementById('accountLocked').style.display = 'block';
+    document.getElementById('accountContent').style.display = 'none';
+    return;
+  }
+  document.getElementById('accountLocked').style.display = 'none';
+  document.getElementById('accountContent').style.display = 'block';
+  document.getElementById('accountWelcome').textContent =
+    `Logged in as ${currentProfile.full_name || currentUser.email} (${currentProfile.category})`;
+
+  const isPublisher = currentProfile.category === 'publisher';
+  document.getElementById('publisherPanel').style.display = isPublisher ? 'block' : 'none';
+  document.getElementById('buyerPanel').style.display = isPublisher ? 'none' : 'block';
+
+  if(isPublisher){
+    const { data } = await sb.from('listings').select('*').eq('publisher_id', currentUser.id).order('created_at', {ascending:false});
+    const body = document.getElementById('myListingsBody');
+    body.innerHTML = '';
+    (data||[]).forEach(l => {
+      body.innerHTML += `<tr><td>${l.title}</td><td>₹${l.price||'—'}</td><td><span class="badge status-${l.status} rounded-pill px-3 py-2">${l.status}</span></td></tr>`;
+    });
+    if(!data || data.length===0) body.innerHTML = '<tr><td colspan="3" class="text-center text-muted py-3">No submissions yet.</td></tr>';
+  } else {
+    const { data } = await sb.from('book_requests').select('*').eq('requester_id', currentUser.id).order('created_at', {ascending:false});
+    const body = document.getElementById('myRequestsBody');
+    body.innerHTML = '';
+    (data||[]).forEach(r => {
+      body.innerHTML += `<tr><td>${r.book_title}</td><td class="small">${r.notes||''}</td><td><span class="badge status-approved rounded-pill px-3 py-2">${r.status}</span></td></tr>`;
+    });
+    if(!data || data.length===0) body.innerHTML = '<tr><td colspan="3" class="text-center text-muted py-3">No requests yet.</td></tr>';
+  }
+}
+
+async function submitListing(e){
+  e.preventDefault();
+  await sb.from('listings').insert({
+    publisher_id: currentUser.id,
+    title: document.getElementById('pub_title').value,
+    category: document.getElementById('pub_category').value,
+    origin: document.getElementById('pub_origin').value,
+    mrp: document.getElementById('pub_mrp').value || null,
+    price: document.getElementById('pub_price').value || null,
+    image_url: document.getElementById('pub_image').value,
+    description: document.getElementById('pub_desc').value
+  });
+  document.getElementById('publisherForm').reset();
+  document.getElementById('publisherSuccess').style.display = 'block';
+  renderAccount();
+}
+
+async function submitRequest(e){
+  e.preventDefault();
+  await sb.from('book_requests').insert({
+    requester_id: currentUser.id,
+    book_title: document.getElementById('req_title').value,
+    notes: document.getElementById('req_notes').value
+  });
+  document.getElementById('requestForm').reset();
+  document.getElementById('requestSuccess').style.display = 'block';
+  renderAccount();
+}
+
+/* ============ ADMIN ============ */
+async function renderAdmin(){
+  if(!currentProfile || !currentProfile.is_admin) return;
+
+  const { data: pending } = await sb.from('listings').select('*').eq('status','pending').order('created_at');
+  const lb = document.getElementById('adminListingsBody');
+  lb.innerHTML = '';
+  (pending||[]).forEach(item => {
+    lb.innerHTML += `
+      <tr>
+        <td><strong>${item.title}</strong><br><span class="small text-muted">${item.category||''}</span></td>
+        <td>${item.origin||''}</td>
+        <td>₹${item.price||'—'} <span class="small text-muted">(MRP ₹${item.mrp||'—'})</span></td>
+        <td><span class="badge status-pending rounded-pill px-3 py-2">Pending</span></td>
+        <td>
+          <button class="btn btn-sm btn-success rounded-pill me-1" onclick="approveListing('${item.id}')">Approve</button>
+          <button class="btn btn-sm btn-outline-danger rounded-pill" onclick="rejectListing('${item.id}')">Reject</button>
+        </td>
+      </tr>`;
+  });
+  if(!pending || pending.length===0) lb.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-3">No pending submissions.</td></tr>';
+
+  const { data: requests } = await sb.from('book_requests').select('*').order('created_at', {ascending:false});
+  const rb = document.getElementById('adminRequestsBody');
+  rb.innerHTML = '';
+  (requests||[]).forEach(r => {
+    rb.innerHTML += `<tr><td>${r.book_title}</td><td class="small">${r.notes||''}</td><td>${r.status}</td></tr>`;
+  });
+  if(!requests || requests.length===0) rb.innerHTML = '<tr><td colspan="3" class="text-center text-muted py-3">No requests yet.</td></tr>';
+
+  const { data: contacts } = await sb.from('contact_requests').select('*').order('created_at', {ascending:false});
+  const cb = document.getElementById('adminContactBody');
+  cb.innerHTML = '';
+  (contacts||[]).forEach(c => {
+    cb.innerHTML += `<tr><td>${c.name}</td><td class="small">${c.email||''}<br>${c.phone||''}</td><td class="small">${c.message}</td><td class="small text-muted">${new Date(c.created_at).toLocaleString()}</td></tr>`;
+  });
+  if(!contacts || contacts.length===0) cb.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-3">No messages yet.</td></tr>';
+}
+
+async function approveListing(id){
+  await sb.from('listings').update({ status: 'approved' }).eq('id', id);
+  renderAdmin();
+}
+async function rejectListing(id){
+  await sb.from('listings').update({ status: 'rejected' }).eq('id', id);
+  renderAdmin();
+}
+
+/* ============ INIT ============ */
+refreshSession().then(renderBrowse);
+</script>
+</body>
+</html>
