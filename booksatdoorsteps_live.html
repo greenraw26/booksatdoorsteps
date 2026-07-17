@@ -69,6 +69,7 @@
     <div class="collapse navbar-collapse" id="mainNav">
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-2 align-items-lg-center">
         <li class="nav-item"><a class="nav-link nav-pill px-3" href="#" onclick="showView('browse')">Browse Books</a></li>
+        <li class="nav-item"><a class="nav-link nav-pill px-3 fw-bold" href="#" onclick="showView('learning')" style="color:#4f46e5;">🎮 Learning Zone</a></li>
         <li class="nav-item"><a class="nav-link nav-pill px-3" href="#" onclick="showView('contact')">Contact Us</a></li>
         <li class="nav-item" id="navAccount"><a class="nav-link nav-pill px-3" href="#" onclick="showView('account')">My Account</a></li>
         <li class="nav-item" id="navAdmin" style="display:none;"><a class="nav-link nav-pill px-3 text-muted small" href="#" onclick="showView('admin')">Admin</a></li>
@@ -89,6 +90,17 @@
       <input id="searchBox" type="text" class="form-control form-control-lg mx-auto shadow-sm" style="max-width:480px;border-radius:999px;" placeholder="Search books, publishers, categories…">
     </div>
   </section>
+  <!-- Learning Zone promo strip -->
+  <div class="container pt-4 pb-2">
+    <div class="rounded-4 p-3 d-flex align-items-center gap-3 flex-wrap" style="background:linear-gradient(90deg,#eef2ff,#fce7f3);">
+      <span style="font-size:2rem;">🎮</span>
+      <div class="flex-grow-1">
+        <span class="fw-bold" style="color:#4f46e5;">New: Free Learning Zone!</span>
+        <span class="text-muted ms-2 small">Interactive phonics games for kids — A–Z alphabet stories &amp; guessing game.</span>
+      </div>
+      <a href="#" onclick="showView('learning')" class="btn btn-primary rounded-pill px-4 fw-bold btn-sm flex-shrink-0">Explore Games →</a>
+    </div>
+  </div>
   <div class="container py-4">
     <div class="d-flex flex-wrap gap-2 mb-4" id="filterRow"></div>
     <div class="row g-4" id="bookGrid"></div>
@@ -99,7 +111,51 @@
   </div>
 </div>
 
-<!-- CONTACT US VIEW (open to all, no login) -->
+<!-- LEARNING ZONE VIEW -->
+<div id="view-learning" class="view">
+  <section class="py-5" style="background:radial-gradient(circle at top right,#fef3c7,transparent 55%),radial-gradient(circle at bottom left,#e0f2fe,transparent 55%);">
+    <div class="container text-center">
+      <span class="badge rounded-pill px-3 py-2 mb-3 fw-bold" style="background:#eef2ff;color:#4f46e5;font-size:0.9rem;">🎮 Free for All Students</span>
+      <h2 class="fw-black display-6 mb-3">Learning Zone</h2>
+      <p class="lead text-muted mb-5">Interactive phonics games to help children learn the alphabet, letter sounds, and reading skills.</p>
+      <div class="row g-4 justify-content-center" style="max-width:800px;margin:0 auto;">
+        <div class="col-md-6">
+          <div class="card border-0 shadow rounded-4 h-100 p-2">
+            <div class="card-body text-center p-4">
+              <div style="font-size:4rem;margin-bottom:1rem;">🔤</div>
+              <h4 class="fw-black mb-2">Phonics Alphabet Stories</h4>
+              <p class="text-muted mb-4">Explore every letter A–Z through colourful stories, sound activities, letter tracing and word discovery. Earn stars as you master each letter!</p>
+              <ul class="list-unstyled text-start small text-muted mb-4">
+                <li>✅ Interactive story for every letter</li>
+                <li>✅ Sound matching activities</li>
+                <li>✅ Letter tracing practice</li>
+                <li>✅ Star rewards &amp; progress tracking</li>
+              </ul>
+              <a href="phonics-alphabet-stories.html" class="btn btn-primary rounded-pill px-5 py-2 fw-bold fs-5 w-100">▶ Play Now</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card border-0 shadow rounded-4 h-100 p-2">
+            <div class="card-body text-center p-4">
+              <div style="font-size:4rem;margin-bottom:1rem;">🎯</div>
+              <h4 class="fw-black mb-2">Phonics Guessing Game</h4>
+              <p class="text-muted mb-4">See a picture, hear the sound clue, pick the right letter! Four exciting game modes — Story, Quiz, Speed Round and Custom Practice.</p>
+              <ul class="list-unstyled text-start small text-muted mb-4">
+                <li>✅ Multiple choice quiz format</li>
+                <li>✅ Timed speed challenge mode</li>
+                <li>✅ Custom letter selection</li>
+                <li>✅ Score tracking &amp; leaderboard</li>
+              </ul>
+              <a href="phonics-guessing-game.html" class="btn btn-success rounded-pill px-5 py-2 fw-bold fs-5 w-100">▶ Play Now</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="text-muted small mt-4">🔒 Log in to save your progress and scores across sessions.</p>
+    </div>
+  </section>
+</div>
 <div id="view-contact" class="view">
   <div class="container py-5" style="max-width:640px;">
     <h2 class="fw-bold mb-2">Get in touch</h2>
