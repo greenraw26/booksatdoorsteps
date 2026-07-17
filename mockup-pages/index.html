@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Books at Doorsteps – Mockup Pages</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --dd-primary: #4f46e5;
+      --dd-primary-soft: #eef2ff;
+      --dd-pink: #fb7185;
+      --dd-yellow: #facc15;
+      --dd-bg-soft: #f4f5fb;
+    }
+    * { box-sizing: border-box; }
+    body { 
+      font-family: "Nunito", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #f4f5fb 0%, #eef2ff 100%);
+      min-height: 100vh;
+    }
+    .hero {
+      background: linear-gradient(135deg, var(--dd-primary) 0%, var(--dd-pink) 100%);
+      color: white;
+      padding: 4rem 0;
+      margin-bottom: 3rem;
+    }
+    .brand-badge {
+      width: 48px; 
+      height: 48px; 
+      border-radius: 999px;
+      display: inline-flex; 
+      align-items: center; 
+      justify-content: center;
+      font-weight: 800; 
+      font-size: 1rem;
+      background: linear-gradient(135deg, #4f46e5, #fb7185); 
+      color: white;
+      margin-right: 1rem;
+    }
+    .card-mockup {
+      border: none;
+      border-radius: 1.5rem;
+      box-shadow: 0 10px 30px rgba(79, 70, 229, 0.1);
+      transition: all 0.3s ease;
+      overflow: hidden;
+      height: 100%;
+    }
+    .card-mockup:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px rgba(79, 70, 229, 0.2);
+    }
+    .card-mockup .card-img-top {
+      height: 200px;
+      background: linear-gradient(135deg, var(--dd-primary-soft) 0%, #e0f2fe 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+    }
+    .card-mockup .card-body {
+      padding: 1.5rem;
+    }
+    .card-mockup h5 {
+      color: var(--dd-primary);
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .card-mockup p {
+      color: #6b7280;
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
+    }
+    .badge-feature {
+      display: inline-block;
+      background: #eef2ff;
+      color: var(--dd-primary);
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-right: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .btn-view {
+      background: linear-gradient(135deg, var(--dd-primary) 0%, var(--dd-pink) 100%);
+      border: none;
+      color: white;
+      font-weight: 700;
+      border-radius: 999px;
+      padding: 0.6rem 1.5rem;
+      text-decoration: none;
+      display: inline-block;
+      transition: all 0.3s ease;
+    }
+    .btn-view:hover {
+      transform: scale(1.05);
+      color: white;
+      text-decoration: none;
+      box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .stat-box {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 1rem;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    }
+    .stat-box .number {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--dd-primary);
+    }
+    .stat-box .label {
+      font-size: 0.85rem;
+      color: #6b7280;
+      margin-top: 0.5rem;
+    }
+    footer {
+      background: #111827;
+      color: #d1d5db;
+      padding: 2rem 0;
+      margin-top: 4rem;
+      text-align: center;
+    }
+    .section-title {
+      color: var(--dd-primary);
+      font-weight: 800;
+      font-size: 2rem;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Hero Section -->
+<div class="hero">
+  <div class="container">
+    <div class="d-flex align-items-center mb-4">
+      <span class="brand-badge">BD</span>
+      <div>
+        <h1 class="mb-0">Books at Doorsteps</h1>
+        <p class="mb-0 opacity-75">Mockup Pages Collection</p>
+      </div>
+    </div>
+    <p class="lead mb-0">Explore our complete UI mockup pages with dropdown menus, responsive design, and professional styling. Download and view in your browser.</p>
+  </div>
+</div>
+
+<!-- Stats Section -->
+<div class="container mb-5">
+  <div class="stats-grid">
+    <div class="stat-box">
+      <div class="number">5</div>
+      <div class="label">Mockup Pages</div>
+    </div>
+    <div class="stat-box">
+      <div class="number">1,283</div>
+      <div class="label">Lines of Code</div>
+    </div>
+    <div class="stat-box">
+      <div class="number">∞</div>
+      <div class="label">Possibilities</div>
+    </div>
+    <div class="stat-box">
+      <div class="number">100%</div>
+      <div class="label">Free & Open</div>
+    </div>
+  </div>
+</div>
+
+<!-- Mockup Pages Grid -->
+<div class="container mb-5">
+  <h2 class="section-title">All Mockup Pages</h2>
+  
+  <div class="row g-4">
+    <!-- Landing Page -->
+    <div class="col-md-6 col-lg-4">
+      <div class="card-mockup">
+        <div class="card-img-top">🛒</div>
+        <div class="card-body">
+          <h5>Landing Page</h5>
+          <p>Main marketplace page with book browsing, search, login/signup, and admin panel. Full Supabase integration.</p>
+          <div>
+            <span class="badge-feature">📱 Responsive</span>
+            <span class="badge-feature">🔍 Search</span>
+            <span class="badge-feature">👤 Auth</span>
+          </div>
+          <a href="booksatdoorsteps_live.html" class="btn-view">View Page →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="col-md-6 col-lg-4">
+      <div class="card-mockup">
+        <div class="card-img-top">📊</div>
+        <div class="card-body">
+          <h5>Admin Dashboard</h5>
+          <p>Complete admin dashboard with stats cards, recent orders, quick store lookup, and job requests snapshot.</p>
+          <div>
+            <span class="badge-feature">📈 Stats</span>
+            <span class="badge-feature">📋 Orders</span>
+            <span class="badge-feature">⚙️ Admin</span>
+          </div>
+          <a href="dashboard.html" class="btn-view">View Page →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Orders List -->
+    <div class="col-md-6 col-lg-4">
+      <div class="card-mockup">
+        <div class="card-img-top">📦</div>
+        <div class="card-body">
+          <h5>Orders Management</h5>
+          <p>Order management page with search filters, status dropdowns, and comprehensive order table with actions.</p>
+          <div>
+            <span class="badge-feature">🔍 Search</span>
+            <span class="badge-feature">🔽 Filter</span>
+            <span class="badge-feature">📊 Table</span>
+          </div>
+          <a href="orders-list.html" class="btn-view">View Page →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Users Management -->
+    <div class="col-md-6 col-lg-4">
+      <div class="card-mockup">
+        <div class="card-img-top">👥</div>
+        <div class="card-body">
+          <h5>Users Management</h5>
+          <p>User management page with tab navigation (Parents / School Professionals) and detailed user information table.</p>
+          <div>
+            <span class="badge-feature">📑 Tabs</span>
+            <span class="badge-feature">👤 Profiles</span>
+            <span class="badge-feature">✏️ Edit</span>
+          </div>
+          <a href="users.html" class="btn-view">View Page →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Store Locator -->
+    <div class="col-md-6 col-lg-4">
+      <div class="card-mockup">
+        <div class="card-img-top">📍</div>
+        <div class="card-body">
+          <h5>Store Locator</h5>
+          <p>Store locator with state, city, and vendor dropdowns. Find physical stores with contact details and addresses.</p>
+          <div>
+            <span class="badge-feature">🗺️ Maps</span>
+            <span class="badge-feature">🔽 Dropdowns</span>
+            <span class="badge-feature">📞 Contact</span>
+          </div>
+          <a href="store-locator.html" class="btn-view">View Page →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- README -->
+    <div class="col-md-6 col-lg-4">
+      <div class="card-mockup">
+        <div class="card-img-top">📖</div>
+        <div class="card-body">
+          <h5>Documentation</h5>
+          <p>Complete documentation about the mockup pages collection, features, and how to use each page.</p>
+          <div>
+            <span class="badge-feature">📝 Guide</span>
+            <span class="badge-feature">💡 Tips</span>
+            <span class="badge-feature">🔗 Links</span>
+          </div>
+          <a href="README.md" class="btn-view">View Docs →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Features Section -->
+<div class="container mb-5">
+  <h2 class="section-title">What's Included</h2>
+  
+  <div class="row g-4">
+    <div class="col-md-6">
+      <div style="background: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);">
+        <h5 style="color: var(--dd-primary); font-weight: 700; margin-bottom: 1rem;">✨ Design Features</h5>
+        <ul style="list-style: none; padding: 0;">
+          <li style="margin-bottom: 0.75rem;"><strong>✅ Bootstrap 5.3.3</strong> – Responsive framework</li>
+          <li style="margin-bottom: 0.75rem;"><strong>✅ Nunito Font</strong> – Professional typography</li>
+          <li style="margin-bottom: 0.75rem;"><strong>✅ Color Scheme</strong> – Indigo, pink, yellow palette</li>
+          <li style="margin-bottom: 0.75rem;"><strong>✅ Rounded Corners</strong> – Modern UI design</li>
+          <li style="margin-bottom: 0.75rem;"><strong>✅ Gradients</strong> – Beautiful backgrounds</li>
+          <li style="margin-bottom: 0.75rem;"><strong>✅ Shadows</strong> – Depth and elevation</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div style="background: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);">
+        <h5 style="color: var(--dd-primary); font-weight: 700; margin-bottom: 1rem;">🎯 Interactive Elements</h5>
+        <ul style="list-style: none; padding: 0;">
+          <li style="margin-bottom: 0.75rem;"><strong>✅ Dropdown Menus</strong> – Fully functional</li>
+          <li style="margin-bottom: 0.75rem;"><strong>✅ Tabs & Navigation</strong> – Tab switching</li>
+          <li style="margin-bottom: 0.75rem;"><strong>✅ Form Inputs</strong> – All input types</li>
+          <li style="margin-bottom: 0.75rem;"><strong>✅ Buttons</strong> – Multiple styles</li>
+          <li style="margin-bottom: 0.75rem;"><strong>✅ Tables</strong> – Data displays</li>
+          <li style="margin-bottom: 0.75rem;"><strong>✅ Badges & Pills</strong> – Status indicators</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Start Guide -->
+<div class="container mb-5">
+  <div style="background: linear-gradient(135deg, var(--dd-primary-soft) 0%, #fce7f3 100%); padding: 2.5rem; border-radius: 1.5rem; border-left: 5px solid var(--dd-primary);">
+    <h3 style="color: var(--dd-primary); font-weight: 700; margin-bottom: 1rem;">🚀 How to View</h3>
+    
+    <div class="row g-3">
+      <div class="col-md-6">
+        <h6 style="color: var(--dd-primary); font-weight: 700; margin-bottom: 0.5rem;">Option 1: View Now (Online)</h6>
+        <p style="margin-bottom: 0;">All pages are live on GitHub. Click any "View Page →" button above to see the mockup instantly.</p>
+      </div>
+      <div class="col-md-6">
+        <h6 style="color: var(--dd-primary); font-weight: 700; margin-bottom: 0.5rem;">Option 2: Download & Open Locally</h6>
+        <p style="margin-bottom: 0;">1. Download this entire folder<br>2. Extract ZIP<br>3. Double-click any HTML file<br>4. View in browser</p>
+      </div>
+    </div>
+
+    <hr style="border-top: 1px solid rgba(79, 70, 229, 0.2); margin: 1.5rem 0;">
+
+    <div style="background: white; padding: 1rem; border-radius: 0.75rem;">
+      <h6 style="color: #111827; font-weight: 700; margin-bottom: 0.75rem;">📥 Download All Files</h6>
+      <p style="margin-bottom: 0.5rem;">
+        <strong>Repository:</strong> 
+        <a href="https://github.com/greenraw26/booksatdoorsteps" target="_blank" style="color: var(--dd-primary); text-decoration: none; font-weight: 700;">
+          https://github.com/greenraw26/booksatdoorsteps
+        </a>
+      </p>
+      <p style="margin-bottom: 0.5rem;">
+        <strong>Mockup Folder:</strong> 
+        <a href="https://github.com/greenraw26/booksatdoorsteps/tree/main/mockup-pages" target="_blank" style="color: var(--dd-primary); text-decoration: none; font-weight: 700;">
+          /mockup-pages
+        </a>
+      </p>
+      <p style="margin-bottom: 0;">
+        <strong>Steps:</strong> Click Code → Download ZIP → Extract → Open any HTML file
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- Technology Stack -->
+<div class="container mb-5">
+  <h2 class="section-title">Technology Stack</h2>
+  
+  <div class="row g-3">
+    <div class="col-6 col-md-3">
+      <div style="text-align: center;">
+        <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📦</div>
+        <strong style="display: block; margin-bottom: 0.25rem;">Bootstrap 5</strong>
+        <small style="color: #6b7280;">Responsive CSS Framework</small>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div style="text-align: center;">
+        <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🎨</div>
+        <strong style="display: block; margin-bottom: 0.25rem;">CSS3</strong>
+        <small style="color: #6b7280;">Gradients & Animations</small>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div style="text-align: center;">
+        <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📝</div>
+        <strong style="display: block; margin-bottom: 0.25rem;">HTML5</strong>
+        <small style="color: #6b7280;">Semantic Structure</small>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div style="text-align: center;">
+        <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">⚡</div>
+        <strong style="display: block; margin-bottom: 0.25rem;">JavaScript</strong>
+        <small style="color: #6b7280;">Interactive Features</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Info Cards -->
+<div class="container mb-5">
+  <div class="row g-4">
+    <div class="col-md-4">
+      <div style="background: white; padding: 1.5rem; border-radius: 1rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); text-align: center;">
+        <div style="font-size: 2rem; margin-bottom: 1rem;">🖥️</div>
+        <h6 style="color: var(--dd-primary); font-weight: 700; margin-bottom: 0.5rem;">Desktop View</h6>
+        <p style="color: #6b7280; font-size: 0.9rem; margin-bottom: 0;">Perfect on large screens with full navigation and details.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div style="background: white; padding: 1.5rem; border-radius: 1rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); text-align: center;">
+        <div style="font-size: 2rem; margin-bottom: 1rem;">📱</div>
+        <h6 style="color: var(--dd-primary); font-weight: 700; margin-bottom: 0.5rem;">Mobile Responsive</h6>
+        <p style="color: #6b7280; font-size: 0.9rem; margin-bottom: 0;">Adapts beautifully to phones and tablets.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div style="background: white; padding: 1.5rem; border-radius: 1rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); text-align: center;">
+        <div style="font-size: 2rem; margin-bottom: 1rem;">🎯</div>
+        <h6 style="color: var(--dd-primary); font-weight: 700; margin-bottom: 0.5rem;">Ready to Use</h6>
+        <p style="color: #6b7280; font-size: 0.9rem; margin-bottom: 0;">No setup needed - just download and open in browser.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer>
+  <div class="container">
+    <p style="margin-bottom: 0.5rem;"><strong>Books at Doorsteps</strong> – Mockup Pages Collection</p>
+    <p style="font-size: 0.9rem; margin-bottom: 0;">
+      © 2025 All Rights Reserved | 
+      <a href="https://github.com/greenraw26/booksatdoorsteps" target="_blank" style="color: #4f46e5; text-decoration: none;">GitHub Repository</a> | 
+      <a href="mailto:support@booksatdoorsteps.com" style="color: #4f46e5; text-decoration: none;">support@booksatdoorsteps.com</a>
+    </p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
