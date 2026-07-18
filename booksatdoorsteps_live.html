@@ -52,6 +52,20 @@
   .admin-row:hover { background-color: #f9fafb; }
   footer { background: #111827; color: #d1d5db; }
   .locked-banner { background: #fff7ed; border: 1px solid #fed7aa; color: #9a3412; border-radius: 1rem; padding: 1rem 1.25rem; }
+  .learning-banner {
+    background: linear-gradient(135deg, #eef2ff, #fdf2f8);
+    border: 1px solid #e0e7ff;
+    border-radius: 1rem;
+  }
+  .learning-card {
+    border-radius: 1rem;
+    border: 1px solid #e5e7eb;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .learning-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 .5rem 1rem rgba(17,24,39,.08);
+  }
 </style>
 </head>
 <body>
@@ -69,6 +83,7 @@
     <div class="collapse navbar-collapse" id="mainNav">
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-2 align-items-lg-center">
         <li class="nav-item"><a class="nav-link nav-pill px-3" href="#" onclick="showView('browse')">Browse Books</a></li>
+        <li class="nav-item"><a class="nav-link nav-pill px-3" href="#" onclick="showView('learning')">Learning Zone</a></li>
         <li class="nav-item"><a class="nav-link nav-pill px-3" href="#" onclick="showView('contact')">Contact Us</a></li>
         <li class="nav-item" id="navAccount"><a class="nav-link nav-pill px-3" href="#" onclick="showView('account')">My Account</a></li>
         <li class="nav-item" id="navAdmin" style="display:none;"><a class="nav-link nav-pill px-3 text-muted small" href="#" onclick="showView('admin')">Admin</a></li>
@@ -90,11 +105,60 @@
     </div>
   </section>
   <div class="container py-4">
+    <div class="learning-banner d-flex flex-wrap justify-content-between align-items-center gap-3 p-3 p-md-4 mb-4">
+      <div>
+        <p class="small fw-bold text-uppercase mb-1" style="letter-spacing:.1em;color:#6d28d9;">New for kids</p>
+        <h2 class="h5 fw-bold mb-1">Try our interactive phonics games</h2>
+        <p class="text-muted mb-0 small">Stories, sound matching, tracing, and quiz challenges from A to Z.</p>
+      </div>
+      <button class="btn btn-primary rounded-pill px-4" onclick="showView('learning')">Open Learning Zone</button>
+    </div>
     <div class="d-flex flex-wrap gap-2 mb-4" id="filterRow"></div>
     <div class="row g-4" id="bookGrid"></div>
     <div id="emptyState" class="text-center text-muted py-5" style="display:none;">
       <p class="fs-5">No books yet in this category.</p>
       <p class="small">Check back soon, or <a href="#" onclick="showView(currentUser ? 'account' : 'login')">log in to request a title</a>.</p>
+    </div>
+  </div>
+</div>
+
+<!-- LEARNING ZONE VIEW -->
+<div id="view-learning" class="view">
+  <div class="container py-5">
+    <div class="text-center mb-4">
+      <p class="text-uppercase small fw-bold mb-2" style="letter-spacing:.12em;color:#6b7280;">Learning Zone</p>
+      <h2 class="fw-bold mb-2">Play and learn phonics</h2>
+      <p class="text-muted mb-0">Practice letter sounds with guided story and quiz games.</p>
+    </div>
+    <div class="row g-4 justify-content-center">
+      <div class="col-md-6 col-lg-5">
+        <div class="card learning-card h-100">
+          <div class="card-body p-4 d-flex flex-column">
+            <h3 class="h5 fw-bold">Phonics Alphabet Stories</h3>
+            <p class="text-muted">Explore A–Z stories, sound matching, tracing practice, and word discovery.</p>
+            <ul class="small text-muted ps-3 mb-4">
+              <li>26 letters with progress stars</li>
+              <li>Story audio with letter sounds</li>
+              <li>Interactive tracing canvas</li>
+            </ul>
+            <a class="btn btn-primary rounded-pill mt-auto" href="phonics-alphabet-stories.html">Play Game</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-5">
+        <div class="card learning-card h-100">
+          <div class="card-body p-4 d-flex flex-column">
+            <h3 class="h5 fw-bold">Phonics Guessing Game</h3>
+            <p class="text-muted">Test recognition speed in story, quiz, speed round, and custom practice modes.</p>
+            <ul class="small text-muted ps-3 mb-4">
+              <li>Streak tracking and high score</li>
+              <li>Timer-based challenge mode</li>
+              <li>Leaderboard integration</li>
+            </ul>
+            <a class="btn btn-primary rounded-pill mt-auto" href="phonics-guessing-game.html">Play Game</a>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

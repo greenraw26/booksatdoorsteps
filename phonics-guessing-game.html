@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Phonics Guessing Game</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    body { background: #f8fafc; }
+    .choice-btn { min-width: 90px; }
+    .mode-chip { border-radius: 999px; }
+  </style>
+</head>
+<body>
+  <div class="container py-4 py-md-5" style="max-width: 860px;">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+      <div>
+        <h1 class="h3 fw-bold mb-1">Phonics Guessing Game</h1>
+        <p class="text-muted mb-0">Choose modes, listen to hints, and build your streak.</p>
+      </div>
+      <a href="booksatdoorsteps_live.html" class="btn btn-outline-secondary rounded-pill">Back to Learning Zone</a>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+      <div class="card-body p-4">
+        <h2 class="h5 fw-bold mb-3">Game Mode</h2>
+        <div class="d-flex flex-wrap gap-2">
+          <button class="btn btn-primary mode-chip" data-mode="story">📖 Story Mode</button>
+          <button class="btn btn-outline-primary mode-chip" data-mode="quiz">🎯 Quiz Mode</button>
+          <button class="btn btn-outline-primary mode-chip" data-mode="speed">⚡ Speed Round</button>
+          <button class="btn btn-outline-primary mode-chip" data-mode="custom">✏️ Custom Practice</button>
+        </div>
+        <div id="customPicker" class="mt-3" style="display:none;">
+          <label class="form-label small fw-semibold">Choose letters</label>
+          <input id="customLetters" class="form-control" placeholder="Example: A B C D" />
+        </div>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+      <div class="card-body p-4">
+        <div class="row g-3 mb-3">
+          <div class="col-md-3"><div class="p-3 bg-light rounded-3">Score: <strong id="score">0</strong></div></div>
+          <div class="col-md-3"><div class="p-3 bg-light rounded-3">Streak: <strong id="streak">0</strong></div></div>
+          <div class="col-md-3"><div class="p-3 bg-light rounded-3">Best Streak: <strong id="bestStreak">0</strong></div></div>
+          <div class="col-md-3"><div class="p-3 bg-light rounded-3">Timer: <strong id="timer">—</strong></div></div>
+        </div>
+
+        <div class="text-center mb-3">
+          <p class="small text-muted mb-1">Listen and select the correct letter</p>
+          <h2 id="prompt" class="h4 fw-bold">Press Start</h2>
+        </div>
+
+        <div class="d-flex flex-wrap justify-content-center gap-2 mb-3" id="choices"></div>
+        <div class="text-center">
+          <button id="playHint" class="btn btn-outline-primary rounded-pill me-2">🔊 Play Hint</button>
+          <button id="startGame" class="btn btn-primary rounded-pill">Start Game</button>
+        </div>
+        <p id="feedback" class="text-center fw-semibold mt-3 mb-0"></p>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+      <div class="card-body p-4">
+        <h2 class="h5 fw-bold mb-3">Top Scores</h2>
+        <ol id="leaderboard" class="mb-0"></ol>
+      </div>
+    </div>
+
+    <div id="resultPanel" class="alert alert-info rounded-4" style="display:none;"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://ebmzkpcujwwnqagbthby.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_mPwZfvEi6rZJ_TEHJ-qlUw_uxLpeZWZ";
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+    let mode = "story";
+    let pool = [...LETTERS];
+    let current = null;
+    let score = 0;
+    let streak = 0;
+    let bestStreak = 0;
+    let rounds = 0;
+    let timerId = null;
+    let timeLeft = null;
+    let userId = null;
+
+    const scoreEl = document.getElementById("score");
+    const streakEl = document.getElementById("streak");
+    const bestEl = document.getElementById("bestStreak");
+    const timerEl = document.getElementById("timer");
+    const promptEl = document.getElementById("prompt");
+    const feedbackEl = document.getElementById("feedback");
+
+    function speak(text){
+      if(!("speechSynthesis" in window)) return;
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.rate = 0.9;
+      speechSynthesis.cancel();
+      speechSynthesis.speak(utter);
+    }
+
+    function setMode(next){
+      mode = next;
+      document.querySelectorAll("[data-mode]").forEach(btn => {
+        btn.className = `btn ${btn.dataset.mode === mode ? "btn-primary" : "btn-outline-primary"} mode-chip`;
+      });
+      document.getElementById("customPicker").style.display = mode === "custom" ? "block" : "none";
+      resetBoard();
+    }
+
+    function resetBoard(){
+      clearInterval(timerId);
+      timerId = null;
+      score = 0; streak = 0; rounds = 0; timeLeft = null;
+      scoreEl.textContent = "0";
+      streakEl.textContent = "0";
+      timerEl.textContent = "—";
+      feedbackEl.textContent = "";
+      promptEl.textContent = "Press Start";
+      document.getElementById("choices").innerHTML = "";
+      document.getElementById("resultPanel").style.display = "none";
+    }
+
+    function preparePool(){
+      if(mode === "story") pool = [...LETTERS];
+      else if(mode === "custom") {
+        const raw = document.getElementById("customLetters").value.toUpperCase();
+        const chosen = Array.from(new Set(raw.replace(/[^A-Z]/g, "").split("")));
+        pool = chosen.length ? chosen : [...LETTERS];
+      } else {
+        pool = [...LETTERS];
+      }
+    }
+
+    function updateCounters(){
+      scoreEl.textContent = String(score);
+      streakEl.textContent = String(streak);
+      bestStreak = Math.max(bestStreak, streak);
+      bestEl.textContent = String(bestStreak);
+      timerEl.textContent = timeLeft == null ? "—" : `${timeLeft}s`;
+    }
+
+    function buildChoices(answer){
+      const choices = [answer];
+      while(choices.length < 4){
+        const pick = LETTERS[Math.floor(Math.random() * LETTERS.length)];
+        if(!choices.includes(pick)) choices.push(pick);
+      }
+      return choices.sort(() => Math.random() - 0.5);
+    }
+
+    function nextQuestion(){
+      if(mode === "story" && pool.length === 0) return finishGame();
+      if(mode === "speed" && rounds >= 10) return finishGame();
+
+      rounds += 1;
+      current = mode === "story" ? pool.shift() : pool[Math.floor(Math.random() * pool.length)];
+      promptEl.textContent = `Which letter makes this sound?`;
+
+      const wrap = document.getElementById("choices");
+      wrap.innerHTML = "";
+      buildChoices(current).forEach(c => {
+        const btn = document.createElement("button");
+        btn.className = "btn btn-outline-dark choice-btn rounded-pill";
+        btn.textContent = c;
+        btn.onclick = () => answer(c);
+        wrap.appendChild(btn);
+      });
+
+      speak(`${current.toLowerCase()} sound`);
+
+      if(mode === "speed"){
+        clearInterval(timerId);
+        timeLeft = 10;
+        updateCounters();
+        timerId = setInterval(() => {
+          timeLeft -= 1;
+          updateCounters();
+          if(timeLeft <= 0){
+            clearInterval(timerId);
+            streak = 0;
+            feedbackEl.className = "text-center fw-semibold mt-3 mb-0 text-danger";
+            feedbackEl.textContent = `⏱️ Time up! Correct letter: ${current}`;
+            setTimeout(nextQuestion, 700);
+          }
+        }, 1000);
+      } else {
+        timeLeft = null;
+        updateCounters();
+      }
+    }
+
+    function answer(choice){
+      if(mode === "speed" && timeLeft <= 0) return;
+      const ok = choice === current;
+      if(ok){
+        score += mode === "speed" ? 15 : 10;
+        streak += 1;
+        feedbackEl.className = "text-center fw-semibold mt-3 mb-0 text-success";
+        feedbackEl.textContent = "✅ Correct!";
+      } else {
+        streak = 0;
+        feedbackEl.className = "text-center fw-semibold mt-3 mb-0 text-danger";
+        feedbackEl.textContent = `❌ Nope. Correct: ${current}`;
+      }
+      clearInterval(timerId);
+      timeLeft = null;
+      updateCounters();
+      setTimeout(nextQuestion, 650);
+    }
+
+    async function finishGame(){
+      clearInterval(timerId);
+      timerId = null;
+      const panel = document.getElementById("resultPanel");
+      const emoji = score >= 120 ? "🏆" : score >= 80 ? "🌟" : "👍";
+      const badge = (await saveScore()) ? "<strong>New High Score!</strong><br>" : "";
+      panel.innerHTML = `${emoji} ${badge}Final Score: <strong>${score}</strong> · Best Streak: <strong>${bestStreak}</strong>`;
+      panel.style.display = "block";
+      promptEl.textContent = "Game finished";
+      await loadLeaderboard();
+    }
+
+    async function saveScore(){
+      if(!userId) return false;
+      const { data: existing } = await sb.from("game_scores")
+        .select("id,best_score")
+        .eq("user_id", userId)
+        .eq("game_key", "phonics_guessing")
+        .eq("mode", mode)
+        .maybeSingle();
+
+      if(existing && Number(existing.best_score) >= score) return false;
+
+      await sb.from("game_scores").upsert({
+        id: existing?.id,
+        user_id: userId,
+        game_key: "phonics_guessing",
+        mode,
+        best_score: score,
+        best_streak: bestStreak
+      });
+      return true;
+    }
+
+    async function loadLeaderboard(){
+      const list = document.getElementById("leaderboard");
+      list.innerHTML = "";
+      const { data } = await sb.from("game_scores")
+        .select("best_score,mode")
+        .eq("game_key", "phonics_guessing")
+        .order("best_score", { ascending: false })
+        .limit(5);
+
+      if(!data || !data.length){
+        list.innerHTML = "<li class='text-muted'>No scores yet. Play first!</li>";
+        return;
+      }
+      data.forEach((row, i) => {
+        const li = document.createElement("li");
+        li.textContent = `#${i + 1} — ${row.best_score} pts (${row.mode})`;
+        list.appendChild(li);
+      });
+    }
+
+    document.querySelectorAll("[data-mode]").forEach(btn => btn.onclick = () => setMode(btn.dataset.mode));
+    document.getElementById("playHint").onclick = () => current && speak(`${current.toLowerCase()} sound`);
+    document.getElementById("startGame").onclick = () => {
+      resetBoard();
+      preparePool();
+      nextQuestion();
+    };
+
+    (async () => {
+      const { data: { session } } = await sb.auth.getSession();
+      userId = session?.user?.id || null;
+      loadLeaderboard();
+      updateCounters();
+    })();
+  </script>
+</body>
+</html>

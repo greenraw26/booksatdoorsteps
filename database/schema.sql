@@ -207,7 +207,73 @@ CREATE INDEX idx_contact_requests_status ON contact_requests(status);
 CREATE INDEX idx_contact_requests_created_at ON contact_requests(created_at DESC);
 
 -- ============================================
--- 5. ORDERS TABLE
+-- 5. STUDENT_PROGRESS TABLE
+-- (Per-letter mastery for learning games)
+-- ============================================
+CREATE TABLE IF NOT EXISTS student_progress (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users ON DELETE CASCADE,
+  game_key TEXT NOT NULL,
+  letter TEXT NOT NULL CHECK (letter ~ '^[A-Z]$'),
+  stars INTEGER DEFAULT 0 CHECK (stars >= 0 AND stars <= 3),
+  mastered BOOLEAN DEFAULT FALSE,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(user_id, game_key, letter)
+);
+
+ALTER TABLE student_progress ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can read own student progress"
+  ON student_progress FOR SELECT
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can upsert own student progress"
+  ON student_progress FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update own student progress"
+  ON student_progress FOR UPDATE
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE INDEX idx_student_progress_user_game ON student_progress(user_id, game_key);
+
+-- ============================================
+-- 6. GAME_SCORES TABLE
+-- (Leaderboard scores for games)
+-- ============================================
+CREATE TABLE IF NOT EXISTS game_scores (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users ON DELETE CASCADE,
+  game_key TEXT NOT NULL,
+  mode TEXT NOT NULL,
+  best_score INTEGER NOT NULL DEFAULT 0,
+  best_streak INTEGER NOT NULL DEFAULT 0,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(user_id, game_key, mode)
+);
+
+ALTER TABLE game_scores ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Anyone can read game scores"
+  ON game_scores FOR SELECT
+  USING (TRUE);
+
+CREATE POLICY "Users can insert own game scores"
+  ON game_scores FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update own game scores"
+  ON game_scores FOR UPDATE
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE INDEX idx_game_scores_game_key_score ON game_scores(game_key, best_score DESC);
+
+-- ============================================
+-- 7. ORDERS TABLE
 -- (Customer orders for books)
 -- ============================================
 CREATE TABLE IF NOT EXISTS orders (
@@ -263,7 +329,7 @@ CREATE INDEX idx_orders_created_at ON orders(created_at DESC);
 CREATE UNIQUE INDEX idx_orders_order_number ON orders(order_number);
 
 -- ============================================
--- 6. ORDER_ITEMS TABLE
+-- 8. ORDER_ITEMS TABLE
 -- (Line items in orders)
 -- ============================================
 CREATE TABLE IF NOT EXISTS order_items (
@@ -301,7 +367,7 @@ CREATE INDEX idx_order_items_order_id ON order_items(order_id);
 CREATE INDEX idx_order_items_listing_id ON order_items(listing_id);
 
 -- ============================================
--- 7. STORE_LOCATIONS TABLE
+-- 9. STORE_LOCATIONS TABLE
 -- (Physical store locations for fulfillment)
 -- ============================================
 CREATE TABLE IF NOT EXISTS store_locations (
@@ -357,7 +423,7 @@ CREATE INDEX idx_store_locations_city ON store_locations(state, city);
 CREATE INDEX idx_store_locations_status ON store_locations(status);
 
 -- ============================================
--- 8. JOB_REQUESTS TABLE
+-- 10. JOB_REQUESTS TABLE
 -- (Career/job applications)
 -- ============================================
 CREATE TABLE IF NOT EXISTS job_requests (
@@ -411,7 +477,7 @@ CREATE INDEX idx_job_requests_acknowledged ON job_requests(acknowledged_by_admin
 CREATE INDEX idx_job_requests_submitted_at ON job_requests(submitted_at DESC);
 
 -- ============================================
--- 9. INVOICES TABLE
+-- 11. INVOICES TABLE
 -- (Generated invoices for orders)
 -- ============================================
 CREATE TABLE IF NOT EXISTS invoices (
@@ -455,7 +521,7 @@ CREATE INDEX idx_invoices_status ON invoices(status);
 CREATE UNIQUE INDEX idx_invoices_invoice_number ON invoices(invoice_number);
 
 -- ============================================
--- 10. AUDIT_LOG TABLE
+-- 12. AUDIT_LOG TABLE
 -- (Track all admin actions)
 -- ============================================
 CREATE TABLE IF NOT EXISTS audit_log (
@@ -581,6 +647,14 @@ EXECUTE FUNCTION update_timestamp();
 
 CREATE TRIGGER contact_requests_update_timestamp
 BEFORE UPDATE ON contact_requests FOR EACH ROW
+EXECUTE FUNCTION update_timestamp();
+
+CREATE TRIGGER student_progress_update_timestamp
+BEFORE UPDATE ON student_progress FOR EACH ROW
+EXECUTE FUNCTION update_timestamp();
+
+CREATE TRIGGER game_scores_update_timestamp
+BEFORE UPDATE ON game_scores FOR EACH ROW
 EXECUTE FUNCTION update_timestamp();
 
 CREATE TRIGGER orders_update_timestamp
