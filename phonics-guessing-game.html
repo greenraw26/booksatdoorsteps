@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>Phonics Guessing Game — Books at Doorsteps</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --dd-primary: #4f46e5;
+  --dd-primary-soft: #eef2ff;
+  --dd-pink: #fb7185;
+  --dd-yellow: #facc15;
+  --dd-green: #22c55e;
+  --dd-orange: #f97316;
+  --dd-bg: #f4f5fb;
+}
+* { box-sizing: border-box; }
+body { font-family: "Nunito", sans-serif; background: var(--dd-bg); }
+.brand-badge {
+  width: 32px; height: 32px; border-radius: 999px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 0.85rem;
+  background: linear-gradient(135deg, #4f46e5, #fb7185); color: white;
+}
+footer { background: #111827; color: #d1d5db; }
+
+/* Mode selector */
+.mode-card {
+  background: white; border-radius: 1.5rem; padding: 1.5rem;
+  text-align: center; cursor: pointer; border: 3px solid transparent;
+  transition: all .2s; box-shadow: 0 4px 16px rgba(0,0,0,.07);
+}
+.mode-card:hover, .mode-card.selected { border-color: var(--dd-primary); background: var(--dd-primary-soft); transform: translateY(-3px); }
+.mode-icon { font-size: 3rem; margin-bottom: 0.5rem; }
+
+/* Game card */
+.game-card {
+  background: white; border-radius: 2rem; padding: 2.5rem;
+  box-shadow: 0 8px 32px rgba(79,70,229,.1); max-width: 640px; margin: 0 auto;
+}
+
+/* Picture display */
+.picture-display {
+  width: 200px; height: 200px; border-radius: 2rem; margin: 0 auto 1.5rem;
+  background: linear-gradient(135deg, #eef2ff, #fce7f3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 7rem; box-shadow: 0 6px 24px rgba(79,70,229,.12);
+  animation: pop 0.5s ease;
+}
+@keyframes pop { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+/* Choice buttons */
+.choice-btn {
+  width: 100%; border-radius: 1.25rem; border: 3px solid #e5e7eb;
+  background: white; font-size: 1.8rem; font-weight: 900;
+  padding: 1rem; cursor: pointer; transition: all .2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,.06);
+}
+.choice-btn:hover { border-color: var(--dd-primary); transform: scale(1.04); }
+.choice-btn.correct { background: #dcfce7 !important; border-color: #22c55e !important; }
+.choice-btn.wrong   { background: #fee2e2 !important; border-color: #ef4444 !important; }
+.choice-btn:disabled { cursor: not-allowed; opacity: 0.8; }
+
+/* Score bar */
+.score-bar { background: white; border-radius: 1.25rem; padding: 1rem 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,.06); }
+
+/* Progress pill */
+.prog-bar { height: 10px; border-radius: 999px; background: #e5e7eb; overflow: hidden; }
+.prog-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--dd-primary), var(--dd-pink)); transition: width .5s ease; }
+
+/* Timer ring */
+.timer-ring { width: 64px; height: 64px; border-radius: 50%; border: 5px solid #e5e7eb; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 800; }
+.timer-ring.urgent { border-color: #ef4444; color: #ef4444; animation: pulse 0.5s infinite alternate; }
+@keyframes pulse { from { transform: scale(1); } to { transform: scale(1.1); } }
+
+/* Feedback */
+.feedback-badge { border-radius: 999px; padding: .5rem 1.5rem; font-weight: 800; font-size: 1.1rem; display: inline-block; }
+.feedback-badge.correct { background: #dcfce7; color: #15803d; }
+.feedback-badge.wrong   { background: #fee2e2; color: #b91c1c; }
+
+/* Leaderboard */
+.lb-row { background: white; border-radius: 1rem; padding: .75rem 1.25rem; margin-bottom: .5rem; display: flex; align-items: center; gap: .75rem; box-shadow: 0 2px 6px rgba(0,0,0,.05); }
+.lb-rank { font-size: 1.5rem; font-weight: 900; width: 2rem; text-align: center; }
+.lb-name { flex: 1; font-weight: 700; }
+.lb-score { font-weight: 800; color: var(--dd-primary); }
+
+/* Results */
+.results-card { background: white; border-radius: 2rem; padding: 2.5rem; text-align: center; box-shadow: 0 8px 32px rgba(79,70,229,.1); max-width: 480px; margin: 0 auto; }
+
+/* Sections */
+.section { display: none; }
+.section.active { display: block; }
+
+/* Locked */
+.locked-banner { background: #fff7ed; border: 1px solid #fed7aa; color: #9a3412; border-radius: 1rem; padding: 1rem 1.25rem; }
+
+@media (max-width: 576px) {
+  .game-card { padding: 1.5rem; }
+  .picture-display { width: 150px; height: 150px; font-size: 5rem; }
+  .choice-btn { font-size: 1.4rem; padding: .75rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+  <div class="container">
+    <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="booksatdoorsteps_live.html">
+      <span class="brand-badge">BD</span>
+      <span>Books at <span class="text-primary">Doorsteps</span></span>
+    </a>
+    <div class="d-flex align-items-center gap-3">
+      <span class="badge bg-success rounded-pill px-3 py-2">🎮 Guessing Game</span>
+      <a href="phonics-alphabet-stories.html" class="btn btn-outline-primary rounded-pill btn-sm px-3">Alphabet Stories →</a>
+      <span id="userBadge" class="badge bg-primary rounded-pill px-3 py-2 d-none"></span>
+    </div>
+  </div>
+</nav>
+
+<div class="container py-4">
+
+  <!-- Login Gate -->
+  <div id="loginGate" class="locked-banner mb-4 d-none">
+    🔒 Please <a href="booksatdoorsteps_live.html" class="fw-bold">log in or sign up</a> to save your scores. You can still play as a guest!
+  </div>
+
+  <!-- Section: Mode Selector -->
+  <div id="sec-modes" class="section active">
+    <div class="text-center mb-4">
+      <h1 class="fw-black" style="font-size:2.2rem;">🎮 Phonics Guessing Game</h1>
+      <p class="text-muted fs-5">Hear the sound — guess the letter! Choose a game mode to start.</p>
+    </div>
+    <div class="row g-3 justify-content-center mb-4" style="max-width:720px;margin:0 auto;">
+      <div class="col-6 col-md-3">
+        <div class="mode-card" onclick="selectMode('story')">
+          <div class="mode-icon">📖</div>
+          <div class="fw-bold">Story Mode</div>
+          <div class="text-muted small">A → Z in order</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="mode-card" onclick="selectMode('quiz')">
+          <div class="mode-icon">🎯</div>
+          <div class="fw-bold">Quiz Mode</div>
+          <div class="text-muted small">Random letters</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="mode-card" onclick="selectMode('speed')">
+          <div class="mode-icon">⚡</div>
+          <div class="fw-bold">Speed Round</div>
+          <div class="text-muted small">Timed challenge</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="mode-card" onclick="selectMode('custom')">
+          <div class="mode-icon">✏️</div>
+          <div class="fw-bold">Custom Practice</div>
+          <div class="text-muted small">Choose letters</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Custom picker (hidden unless custom mode) -->
+    <div id="customPicker" class="d-none" style="max-width:480px;margin:0 auto;">
+      <div class="card border-0 shadow-sm rounded-4 p-3 mb-3">
+        <p class="fw-bold mb-2">Select letters to practise:</p>
+        <div id="customLetterGrid" class="d-flex flex-wrap gap-2"></div>
+        <button class="btn btn-primary rounded-pill px-4 mt-3 w-100" onclick="startCustom()">▶ Start Custom Practice</button>
+      </div>
+    </div>
+
+    <!-- High scores -->
+    <div style="max-width:480px;margin:0 auto;">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5 class="fw-bold mb-0">🏆 Your Best Scores</h5>
+        <span id="guestNote" class="text-muted small"></span>
+      </div>
+      <div id="myScores" class="text-muted small text-center py-3">Play a round to see your scores here!</div>
+    </div>
+  </div>
+
+  <!-- Section: Game Play -->
+  <div id="sec-game" class="section">
+    <!-- Score bar -->
+    <div class="score-bar d-flex align-items-center gap-3 mb-4 flex-wrap" style="max-width:640px;margin:0 auto;">
+      <div class="fw-black fs-4 text-primary">⭐ <span id="scoreDisplay">0</span></div>
+      <div class="flex-grow-1">
+        <div class="d-flex justify-content-between small fw-bold mb-1">
+          <span id="progressLabel">Question 1 of 26</span>
+          <span id="streakLabel">🔥 Streak: 0</span>
+        </div>
+        <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%;"></div></div>
+      </div>
+      <div class="timer-ring" id="timerRing" style="display:none;">
+        <span id="timerVal">10</span>
+      </div>
+      <button class="btn btn-outline-secondary btn-sm rounded-pill" onclick="quitGame()">✕ Quit</button>
+    </div>
+
+    <!-- Game card -->
+    <div class="game-card">
+      <div class="text-center mb-3">
+        <span class="badge rounded-pill px-3 py-2" id="modeBadge" style="background:var(--dd-primary-soft);color:var(--dd-primary);font-weight:700;">📖 Story Mode</span>
+      </div>
+      <div class="picture-display" id="pictureDisplay">🍎</div>
+      <p class="text-center text-muted mb-1 fw-semibold" id="wordClue">What letter does <strong>Apple</strong> start with?</p>
+      <div class="text-center mb-4">
+        <button class="btn btn-primary rounded-pill px-4" onclick="playHint()">🔊 Hear Sound Clue</button>
+      </div>
+      <div class="row g-3" id="choiceGrid"></div>
+      <div class="text-center mt-4" id="feedbackArea"></div>
+    </div>
+  </div>
+
+  <!-- Section: Results -->
+  <div id="sec-results" class="section">
+    <div class="results-card">
+      <div id="resultEmoji" style="font-size:5rem;">🏆</div>
+      <h2 class="fw-black mt-2 mb-1" id="resultTitle">Well Done!</h2>
+      <p class="text-muted mb-3" id="resultSubtitle">You completed the round!</p>
+      <div class="row g-3 mb-4">
+        <div class="col-4 text-center">
+          <div class="fw-black fs-2 text-primary" id="resFinalScore">0</div>
+          <div class="text-muted small">Score</div>
+        </div>
+        <div class="col-4 text-center">
+          <div class="fw-black fs-2 text-success" id="resCorrect">0</div>
+          <div class="text-muted small">Correct</div>
+        </div>
+        <div class="col-4 text-center">
+          <div class="fw-black fs-2 text-warning" id="resBestStreak">0</div>
+          <div class="text-muted small">Best Streak</div>
+        </div>
+      </div>
+      <div id="newBestBadge" class="d-none mb-3">
+        <span class="badge bg-warning text-dark rounded-pill px-4 py-2 fs-6">🎉 New High Score!</span>
+      </div>
+      <button class="btn btn-primary rounded-pill px-5 me-2 mb-2" onclick="playAgain()">▶ Play Again</button>
+      <button class="btn btn-outline-secondary rounded-pill px-5 mb-2" onclick="showSection('sec-modes')">🏠 Choose Mode</button>
+    </div>
+
+    <!-- Leaderboard snippet -->
+    <div style="max-width:480px;margin:2rem auto 0;">
+      <h5 class="fw-bold mb-3 text-center">🏆 Leaderboard</h5>
+      <div id="leaderboard"></div>
+    </div>
+  </div>
+
+</div>
+
+<footer class="py-4 mt-5">
+  <div class="container d-flex flex-wrap justify-content-between align-items-center gap-2 small">
+    <span>© Books at Doorsteps — Learning Zone</span>
+    <span>
+      <a href="phonics-alphabet-stories.html" class="text-light me-3">🔤 Alphabet Stories</a>
+      <a href="booksatdoorsteps_live.html" class="text-light">🏠 Home</a>
+    </span>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ============ CONFIG ============ */
+const SUPABASE_URL = "https://ebmzkpcujwwnqagbthby.supabase.co";
+const SUPABASE_KEY = "sb_publishable_mPwZfvEi6rZJ_TEHJ-qlUw_uxLpeZWZ";
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+/* ============ PHONICS DATA ============ */
+const ALPHABET = [
+  { letter:"A", phoneme:"/æ/", emoji:"🍎", word:"Apple" },
+  { letter:"B", phoneme:"/b/", emoji:"🎈", word:"Ball" },
+  { letter:"C", phoneme:"/k/", emoji:"🐱", word:"Cat" },
+  { letter:"D", phoneme:"/d/", emoji:"🐶", word:"Dog" },
+  { letter:"E", phoneme:"/ɛ/", emoji:"🐘", word:"Elephant" },
+  { letter:"F", phoneme:"/f/", emoji:"🐟", word:"Fish" },
+  { letter:"G", phoneme:"/g/", emoji:"🦒", word:"Giraffe" },
+  { letter:"H", phoneme:"/h/", emoji:"🐎", word:"Horse" },
+  { letter:"I", phoneme:"/ɪ/", emoji:"🍦", word:"Ice Cream" },
+  { letter:"J", phoneme:"/dʒ/", emoji:"🃏", word:"Jaguar" },
+  { letter:"K", phoneme:"/k/", emoji:"🦘", word:"Kangaroo" },
+  { letter:"L", phoneme:"/l/", emoji:"🦁", word:"Lion" },
+  { letter:"M", phoneme:"/m/", emoji:"🐒", word:"Monkey" },
+  { letter:"N", phoneme:"/n/", emoji:"🪹", word:"Nest" },
+  { letter:"O", phoneme:"/ɒ/", emoji:"🦦", word:"Otter" },
+  { letter:"P", phoneme:"/p/", emoji:"🐷", word:"Pig" },
+  { letter:"Q", phoneme:"/kw/", emoji:"👸", word:"Queen" },
+  { letter:"R", phoneme:"/r/", emoji:"🐰", word:"Rabbit" },
+  { letter:"S", phoneme:"/s/", emoji:"🐍", word:"Snake" },
+  { letter:"T", phoneme:"/t/", emoji:"🐯", word:"Tiger" },
+  { letter:"U", phoneme:"/ʌ/", emoji:"☂️", word:"Umbrella" },
+  { letter:"V", phoneme:"/v/", emoji:"🌋", word:"Volcano" },
+  { letter:"W", phoneme:"/w/", emoji:"🐋", word:"Whale" },
+  { letter:"X", phoneme:"/ks/", emoji:"🎵", word:"Xylophone" },
+  { letter:"Y", phoneme:"/j/", emoji:"🧶", word:"Yarn" },
+  { letter:"Z", phoneme:"/z/", emoji:"🦓", word:"Zebra" },
+];
+
+/* ============ STATE ============ */
+let gameMode = null;
+let gameQueue = [];
+let currentQ = 0;
+let score = 0;
+let streak = 0;
+let bestStreak = 0;
+let correctCount = 0;
+let timerInterval = null;
+let timerLeft = 10;
+let currentAnswer = null;
+let currentUser = null;
+let highScores = {};
+let customSelected = new Set();
+let sessionId = null;
+let answeredThisQ = false;
+
+/* ============ SUPABASE AUTH ============ */
+async function initAuth() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    currentUser = session.user;
+    document.getElementById("userBadge").textContent = "👤 " + (currentUser.email || "Student");
+    document.getElementById("userBadge").classList.remove("d-none");
+    await loadHighScores();
+  } else {
+    document.getElementById("loginGate").classList.remove("d-none");
+    document.getElementById("guestNote").textContent = "Log in to save scores";
+  }
+}
+
+async function loadHighScores() {
+  if (!currentUser) return;
+  try {
+    const { data } = await sb.from("game_scores")
+      .select("game_mode, best_score")
+      .eq("user_id", currentUser.id)
+      .eq("game_type", "phonics_guessing");
+    if (data) {
+      data.forEach(r => { highScores[r.game_mode] = r.best_score; });
+      renderMyScores();
+    }
+  } catch (e) { /* silent */ }
+}
+
+function renderMyScores() {
+  const el = document.getElementById("myScores");
+  const modes = ["story","quiz","speed","custom"];
+  const labels = { story:"📖 Story", quiz:"🎯 Quiz", speed:"⚡ Speed", custom:"✏️ Custom" };
+  const rows = modes.map(m => highScores[m]
+    ? `<div class="d-flex justify-content-between px-2 py-1"><span>${labels[m]}</span><span class="fw-bold text-primary">${highScores[m]} pts</span></div>`
+    : null).filter(Boolean);
+  el.innerHTML = rows.length ? rows.join("") : "<span>Play a round to see your scores here!</span>";
+}
+
+async function saveScore(mode, finalScore) {
+  if (!currentUser) return;
+  try {
+    const prev = highScores[mode] || 0;
+    if (finalScore > prev) {
+      highScores[mode] = finalScore;
+      await sb.from("game_scores").upsert({
+        user_id: currentUser.id,
+        game_type: "phonics_guessing",
+        game_mode: mode,
+        best_score: finalScore,
+        updated_at: new Date().toISOString()
+      }, { onConflict: "user_id,game_type,game_mode" });
+      return true; // new best
+    }
+  } catch (e) { /* silent */ }
+  return false;
+}
+
+async function loadLeaderboard() {
+  try {
+    const { data } = await sb.from("game_scores")
+      .select("best_score, user_id")
+      .eq("game_type", "phonics_guessing")
+      .eq("game_mode", gameMode)
+      .order("best_score", { ascending: false })
+      .limit(5);
+    const el = document.getElementById("leaderboard");
+    if (!data || data.length === 0) { el.innerHTML = '<p class="text-muted text-center small">No scores yet. Be the first!</p>'; return; }
+    const medals = ["🥇","🥈","🥉","4️⃣","5️⃣"];
+    el.innerHTML = data.map((r, i) => `
+      <div class="lb-row">
+        <span class="lb-rank">${medals[i]}</span>
+        <span class="lb-name">${r.user_id === currentUser?.id ? "⭐ You" : "Student"}</span>
+        <span class="lb-score">${r.best_score} pts</span>
+      </div>`).join("");
+  } catch (e) { /* silent */ }
+}
+
+/* ============ MODE SELECTION ============ */
+function selectMode(mode) {
+  document.querySelectorAll(".mode-card").forEach(c => c.classList.remove("selected"));
+  event.currentTarget.classList.add("selected");
+  gameMode = mode;
+  if (mode === "custom") {
+    document.getElementById("customPicker").classList.remove("d-none");
+    buildCustomPicker();
+  } else {
+    document.getElementById("customPicker").classList.add("d-none");
+    setTimeout(() => startGame(), 300);
+  }
+}
+
+function buildCustomPicker() {
+  const grid = document.getElementById("customLetterGrid");
+  grid.innerHTML = "";
+  ALPHABET.forEach(d => {
+    const btn = document.createElement("button");
+    btn.className = "btn btn-sm rounded-pill fw-bold " + (customSelected.has(d.letter) ? "btn-primary" : "btn-outline-secondary");
+    btn.textContent = d.letter;
+    btn.onclick = () => {
+      if (customSelected.has(d.letter)) { customSelected.delete(d.letter); btn.className = "btn btn-sm rounded-pill fw-bold btn-outline-secondary"; }
+      else { customSelected.add(d.letter); btn.className = "btn btn-sm rounded-pill fw-bold btn-primary"; }
+    };
+    grid.appendChild(btn);
+  });
+}
+
+function startCustom() {
+  if (customSelected.size === 0) { alert("Please select at least one letter!"); return; }
+  document.getElementById("customPicker").classList.add("d-none");
+  startGame();
+}
+
+/* ============ GAME START ============ */
+function startGame() {
+  score = 0; streak = 0; bestStreak = 0; correctCount = 0; currentQ = 0;
+  sessionId = Date.now().toString();
+
+  const modeLabels = { story:"📖 Story Mode", quiz:"🎯 Quiz Mode", speed:"⚡ Speed Round", custom:"✏️ Custom Practice" };
+  document.getElementById("modeBadge").textContent = modeLabels[gameMode] || "";
+
+  const timerRing = document.getElementById("timerRing");
+  timerRing.style.display = gameMode === "speed" ? "flex" : "none";
+
+  if (gameMode === "story") {
+    gameQueue = [...ALPHABET];
+  } else if (gameMode === "quiz") {
+    gameQueue = [...ALPHABET].sort(() => Math.random() - 0.5);
+  } else if (gameMode === "speed") {
+    gameQueue = [...ALPHABET].sort(() => Math.random() - 0.5);
+  } else if (gameMode === "custom") {
+    gameQueue = ALPHABET.filter(d => customSelected.has(d.letter)).sort(() => Math.random() - 0.5);
+    if (gameQueue.length === 0) gameQueue = [...ALPHABET];
+  }
+
+  showSection("sec-game");
+  loadQuestion();
+}
+
+/* ============ QUESTION ============ */
+function loadQuestion() {
+  answeredThisQ = false;
+  if (currentQ >= gameQueue.length) { endGame(); return; }
+
+  const q = gameQueue[currentQ];
+  currentAnswer = q.letter;
+
+  document.getElementById("pictureDisplay").textContent = q.emoji;
+  document.getElementById("pictureDisplay").style.animation = "none";
+  requestAnimationFrame(() => { document.getElementById("pictureDisplay").style.animation = "pop 0.5s ease"; });
+  document.getElementById("wordClue").innerHTML = "What letter does <strong>" + q.word + "</strong> start with?";
+  document.getElementById("feedbackArea").innerHTML = "";
+  document.getElementById("progressLabel").textContent = "Question " + (currentQ + 1) + " of " + gameQueue.length;
+  document.getElementById("progFill").style.width = (currentQ / gameQueue.length * 100) + "%";
+  document.getElementById("scoreDisplay").textContent = score;
+  document.getElementById("streakLabel").textContent = "🔥 Streak: " + streak;
+
+  buildChoices(q);
+
+  if (gameMode === "speed") { startTimer(); }
+
+  // Auto-play hint in story mode
+  if (gameMode === "story") { setTimeout(playHint, 600); }
+}
+
+function buildChoices(correct) {
+  const distractors = ALPHABET.filter(d => d.letter !== correct.letter)
+    .sort(() => Math.random() - 0.5).slice(0, 3);
+  const choices = [...distractors, correct].sort(() => Math.random() - 0.5);
+
+  const grid = document.getElementById("choiceGrid");
+  grid.innerHTML = "";
+  choices.forEach(c => {
+    const col = document.createElement("div");
+    col.className = "col-6";
+    col.innerHTML = `<button class="choice-btn" id="cb-${c.letter}" onclick="checkAnswer('${c.letter}', this)">${c.letter}</button>`;
+    grid.appendChild(col);
+  });
+}
+
+/* ============ ANSWER CHECK ============ */
+function checkAnswer(chosen, btn) {
+  if (answeredThisQ) return;
+  answeredThisQ = true;
+  stopTimer();
+  document.querySelectorAll(".choice-btn").forEach(b => b.disabled = true);
+
+  const fb = document.getElementById("feedbackArea");
+
+  if (chosen === currentAnswer) {
+    btn.classList.add("correct");
+    streak++;
+    bestStreak = Math.max(bestStreak, streak);
+    const bonus = gameMode === "speed" ? Math.max(0, timerLeft) * 2 : 0;
+    const pts = 10 + bonus;
+    score += pts;
+    correctCount++;
+    fb.innerHTML = `<span class="feedback-badge correct">🎉 Correct! +${pts} pts${bonus ? " (speed bonus!)" : ""}</span>`;
+    speak("Correct! " + currentAnswer + " for " + gameQueue[currentQ].word);
+  } else {
+    const correctBtn = document.getElementById("cb-" + currentAnswer);
+    if (correctBtn) correctBtn.classList.add("correct");
+    btn.classList.add("wrong");
+    streak = 0;
+    fb.innerHTML = `<span class="feedback-badge wrong">❌ The answer is <strong>${currentAnswer}</strong></span>`;
+    speak("Not quite. The answer is " + currentAnswer + " for " + gameQueue[currentQ].word);
+  }
+
+  document.getElementById("scoreDisplay").textContent = score;
+  document.getElementById("streakLabel").textContent = "🔥 Streak: " + streak;
+  currentQ++;
+  setTimeout(loadQuestion, 1800);
+}
+
+/* ============ TIMER (SPEED MODE) ============ */
+function startTimer() {
+  timerLeft = 10;
+  const ring = document.getElementById("timerRing");
+  const val = document.getElementById("timerVal");
+  ring.className = "timer-ring";
+  val.textContent = timerLeft;
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    timerLeft--;
+    val.textContent = timerLeft;
+    if (timerLeft <= 3) ring.className = "timer-ring urgent";
+    if (timerLeft <= 0) {
+      stopTimer();
+      if (!answeredThisQ) {
+        answeredThisQ = true;
+        document.querySelectorAll(".choice-btn").forEach(b => b.disabled = true);
+        const correctBtn = document.getElementById("cb-" + currentAnswer);
+        if (correctBtn) correctBtn.classList.add("correct");
+        streak = 0;
+        document.getElementById("feedbackArea").innerHTML = `<span class="feedback-badge wrong">⏰ Time's up! The answer was <strong>${currentAnswer}</strong></span>`;
+        speak("Time's up! The answer was " + currentAnswer);
+        currentQ++;
+        setTimeout(loadQuestion, 1800);
+      }
+    }
+  }, 1000);
+}
+
+function stopTimer() { clearInterval(timerInterval); }
+
+/* ============ HINT ============ */
+function playHint() {
+  if (currentQ > gameQueue.length - 1 || !gameQueue[currentQ]) return;
+  const q = gameQueue[Math.min(currentQ, gameQueue.length - 1)];
+  speak(q.word + " starts with... " + q.letter + "! " + q.letter + " says " + q.phoneme);
+}
+
+/* ============ SPEECH ============ */
+function speak(text) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.rate = 0.85; utt.pitch = 1.2;
+  window.speechSynthesis.speak(utt);
+}
+
+/* ============ END GAME ============ */
+async function endGame() {
+  stopTimer();
+  showSection("sec-results");
+
+  document.getElementById("resFinalScore").textContent = score;
+  document.getElementById("resCorrect").textContent = correctCount + " / " + gameQueue.length;
+  document.getElementById("resBestStreak").textContent = bestStreak;
+
+  const pct = correctCount / gameQueue.length;
+  let emoji = "😊", title = "Good effort!", subtitle = "Keep practising!";
+  if (pct >= 0.9) { emoji = "🏆"; title = "Excellent!"; subtitle = "You're a phonics star!"; }
+  else if (pct >= 0.7) { emoji = "🎉"; title = "Well Done!"; subtitle = "Great phonics skills!"; }
+  else if (pct >= 0.5) { emoji = "👍"; title = "Not bad!"; subtitle = "Practice makes perfect!"; }
+
+  document.getElementById("resultEmoji").textContent = emoji;
+  document.getElementById("resultTitle").textContent = title;
+  document.getElementById("resultSubtitle").textContent = subtitle;
+
+  const isNewBest = await saveScore(gameMode, score);
+  if (isNewBest) { document.getElementById("newBestBadge").classList.remove("d-none"); }
+  else { document.getElementById("newBestBadge").classList.add("d-none"); }
+
+  renderMyScores();
+  await loadLeaderboard();
+  speak(title + " You scored " + score + " points!");
+}
+
+/* ============ NAVIGATION ============ */
+function showSection(id) {
+  document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+function quitGame() {
+  stopTimer();
+  showSection("sec-modes");
+}
+
+function playAgain() {
+  showSection("sec-modes");
+  document.getElementById("customPicker").classList.add("d-none");
+  document.querySelectorAll(".mode-card").forEach(c => c.classList.remove("selected"));
+  setTimeout(() => startGame(), 300);
+}
+
+/* ============ INIT ============ */
+window.addEventListener("DOMContentLoaded", () => { initAuth(); });
+</script>
+</body>
+</html>

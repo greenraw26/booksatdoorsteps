@@ -11,7 +11,7 @@
 -- Extended user profile linked to Supabase auth.users
 CREATE TABLE IF NOT EXISTS profiles (
   id UUID PRIMARY KEY REFERENCES auth.users ON DELETE CASCADE,
-  category TEXT NOT NULL CHECK (category IN ('publisher', 'school', 'institution', 'individual')),
+  category TEXT NOT NULL CHECK (category IN ('publisher', 'school', 'individual', 'bookseller', 'admin', 'institution')),
   full_name TEXT,
   organisation TEXT,
   phone TEXT,
@@ -219,7 +219,7 @@ CREATE TABLE IF NOT EXISTS orders (
   state TEXT,
   total_amount NUMERIC(12, 2),
   gst_amount NUMERIC(12, 2),
-  status TEXT DEFAULT 'pending_ack' CHECK (status IN ('pending_ack', 'in_process', 'processed', 'shipped', 'delivered', 'cancelled')),
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'processing', 'shipped', 'delivered', 'cancelled')),
   acknowledged_at TIMESTAMP WITH TIME ZONE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
@@ -269,7 +269,7 @@ CREATE UNIQUE INDEX idx_orders_order_number ON orders(order_number);
 CREATE TABLE IF NOT EXISTS order_items (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   order_id UUID NOT NULL REFERENCES orders ON DELETE CASCADE,
-  listing_id UUID NOT NULL REFERENCES listings ON DELETE SET NULL,
+  listing_id UUID REFERENCES listings ON DELETE SET NULL,
   book_title TEXT NOT NULL,
   quantity INTEGER NOT NULL CHECK (quantity > 0),
   unit_price NUMERIC(10, 2) NOT NULL,
@@ -299,6 +299,59 @@ CREATE POLICY "Admins can read all order items"
 -- Indexes
 CREATE INDEX idx_order_items_order_id ON order_items(order_id);
 CREATE INDEX idx_order_items_listing_id ON order_items(listing_id);
+
+-- ============================================
+-- 7. SHIPMENTS TABLE
+-- (Shipment and delivery tracking per order)
+-- ============================================
+CREATE TABLE IF NOT EXISTS shipments (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  order_id UUID NOT NULL UNIQUE REFERENCES orders ON DELETE CASCADE,
+  carrier TEXT,
+  tracking_number TEXT,
+  tracking_url TEXT,
+  current_location TEXT,
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'processing', 'shipped', 'delivered')),
+  shipped_at TIMESTAMP WITH TIME ZONE,
+  delivered_at TIMESTAMP WITH TIME ZONE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+ALTER TABLE shipments ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can read own shipments"
+  ON shipments FOR SELECT
+  USING (
+    order_id IN (
+      SELECT id FROM orders WHERE buyer_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Admins can read all shipments"
+  ON shipments FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM profiles WHERE id = auth.uid() AND is_admin = TRUE
+    )
+  );
+
+CREATE POLICY "Admins can manage shipments"
+  ON shipments FOR ALL
+  USING (
+    EXISTS (
+      SELECT 1 FROM profiles WHERE id = auth.uid() AND is_admin = TRUE
+    )
+  )
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM profiles WHERE id = auth.uid() AND is_admin = TRUE
+    )
+  );
+
+CREATE INDEX idx_shipments_order_id ON shipments(order_id);
+CREATE INDEX idx_shipments_status ON shipments(status);
+CREATE UNIQUE INDEX idx_shipments_tracking_number ON shipments(tracking_number) WHERE tracking_number IS NOT NULL;
 
 -- ============================================
 -- 7. STORE_LOCATIONS TABLE
@@ -357,7 +410,7 @@ CREATE INDEX idx_store_locations_city ON store_locations(state, city);
 CREATE INDEX idx_store_locations_status ON store_locations(status);
 
 -- ============================================
--- 8. JOB_REQUESTS TABLE
+-- 9. JOB_REQUESTS TABLE
 -- (Career/job applications)
 -- ============================================
 CREATE TABLE IF NOT EXISTS job_requests (
@@ -411,7 +464,7 @@ CREATE INDEX idx_job_requests_acknowledged ON job_requests(acknowledged_by_admin
 CREATE INDEX idx_job_requests_submitted_at ON job_requests(submitted_at DESC);
 
 -- ============================================
--- 9. INVOICES TABLE
+-- 10. INVOICES TABLE
 -- (Generated invoices for orders)
 -- ============================================
 CREATE TABLE IF NOT EXISTS invoices (
@@ -455,7 +508,7 @@ CREATE INDEX idx_invoices_status ON invoices(status);
 CREATE UNIQUE INDEX idx_invoices_invoice_number ON invoices(invoice_number);
 
 -- ============================================
--- 10. AUDIT_LOG TABLE
+-- 11. AUDIT_LOG TABLE
 -- (Track all admin actions)
 -- ============================================
 CREATE TABLE IF NOT EXISTS audit_log (
@@ -492,7 +545,7 @@ CREATE INDEX idx_audit_log_timestamp ON audit_log(timestamp DESC);
 CREATE OR REPLACE VIEW dashboard_stats AS
 SELECT
   (SELECT COUNT(*) FROM orders WHERE DATE(created_at) = CURRENT_DATE) as today_orders,
-  (SELECT COUNT(*) FROM orders WHERE status = 'pending_ack') as pending_acks,
+  (SELECT COUNT(*) FROM orders WHERE status = 'pending') as pending_acks,
   (SELECT COUNT(*) FROM orders WHERE DATE(created_at) >= CURRENT_DATE - INTERVAL '30 days') as sample_orders_this_month,
   (SELECT COUNT(*) FROM job_requests WHERE status = 'new') as pending_job_requests;
 
@@ -585,6 +638,10 @@ EXECUTE FUNCTION update_timestamp();
 
 CREATE TRIGGER orders_update_timestamp
 BEFORE UPDATE ON orders FOR EACH ROW
+EXECUTE FUNCTION update_timestamp();
+
+CREATE TRIGGER shipments_update_timestamp
+BEFORE UPDATE ON shipments FOR EACH ROW
 EXECUTE FUNCTION update_timestamp();
 
 CREATE TRIGGER store_locations_update_timestamp

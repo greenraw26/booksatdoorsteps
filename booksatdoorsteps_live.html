@@ -45,6 +45,9 @@
   .price-now { color: var(--dd-primary); font-weight: 800; font-size: 1.15rem; }
   .nav-pill { border-radius: 999px; }
   .status-pending { background-color: #fef9c3; color: #854d0e; }
+  .status-processing { background-color: #dbeafe; color: #1d4ed8; }
+  .status-shipped { background-color: #ede9fe; color: #6d28d9; }
+  .status-delivered { background-color: #dcfce7; color: #15803d; }
   .status-approved { background-color: #dcfce7; color: #15803d; }
   .status-rejected { background-color: #fee2e2; color: #b91c1c; }
   .view { display: none; }
@@ -52,6 +55,12 @@
   .admin-row:hover { background-color: #f9fafb; }
   footer { background: #111827; color: #d1d5db; }
   .locked-banner { background: #fff7ed; border: 1px solid #fed7aa; color: #9a3412; border-radius: 1rem; padding: 1rem 1.25rem; }
+  .timeline-dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 999px;
+    display: inline-block;
+  }
 </style>
 </head>
 <body>
@@ -69,6 +78,7 @@
     <div class="collapse navbar-collapse" id="mainNav">
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-2 align-items-lg-center">
         <li class="nav-item"><a class="nav-link nav-pill px-3" href="#" onclick="showView('browse')">Browse Books</a></li>
+        <li class="nav-item"><a class="nav-link nav-pill px-3 fw-bold" href="#" onclick="showView('learning')" style="color:#4f46e5;">🎮 Learning Zone</a></li>
         <li class="nav-item"><a class="nav-link nav-pill px-3" href="#" onclick="showView('contact')">Contact Us</a></li>
         <li class="nav-item" id="navAccount"><a class="nav-link nav-pill px-3" href="#" onclick="showView('account')">My Account</a></li>
         <li class="nav-item" id="navAdmin" style="display:none;"><a class="nav-link nav-pill px-3 text-muted small" href="#" onclick="showView('admin')">Admin</a></li>
@@ -89,7 +99,22 @@
       <input id="searchBox" type="text" class="form-control form-control-lg mx-auto shadow-sm" style="max-width:480px;border-radius:999px;" placeholder="Search books, publishers, categories…">
     </div>
   </section>
+  <!-- Learning Zone promo strip -->
+  <div class="container pt-4 pb-2">
+    <div class="rounded-4 p-3 d-flex align-items-center gap-3 flex-wrap" style="background:linear-gradient(90deg,#eef2ff,#fce7f3);">
+      <span style="font-size:2rem;">🎮</span>
+      <div class="flex-grow-1">
+        <span class="fw-bold" style="color:#4f46e5;">New: Free Learning Zone!</span>
+        <span class="text-muted ms-2 small">Interactive phonics games for kids — A–Z alphabet stories &amp; guessing game.</span>
+      </div>
+      <a href="#" onclick="showView('learning')" class="btn btn-primary rounded-pill px-4 fw-bold btn-sm flex-shrink-0">Explore Games →</a>
+    </div>
+  </div>
   <div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <h2 class="h4 fw-bold mb-0">Featured books</h2>
+      <span class="small text-muted">Curated listings from verified sellers</span>
+    </div>
     <div class="d-flex flex-wrap gap-2 mb-4" id="filterRow"></div>
     <div class="row g-4" id="bookGrid"></div>
     <div id="emptyState" class="text-center text-muted py-5" style="display:none;">
@@ -97,6 +122,52 @@
       <p class="small">Check back soon, or <a href="#" onclick="showView(currentUser ? 'account' : 'login')">log in to request a title</a>.</p>
     </div>
   </div>
+</div>
+
+<!-- LEARNING ZONE VIEW -->
+<div id="view-learning" class="view">
+  <section class="py-5" style="background:radial-gradient(circle at top right,#fef3c7,transparent 55%),radial-gradient(circle at bottom left,#e0f2fe,transparent 55%);">
+    <div class="container text-center">
+      <span class="badge rounded-pill px-3 py-2 mb-3 fw-bold" style="background:#eef2ff;color:#4f46e5;font-size:0.9rem;">🎮 Free for All Students</span>
+      <h2 class="fw-black display-6 mb-3">Learning Zone</h2>
+      <p class="lead text-muted mb-5">Interactive phonics games to help children learn the alphabet, letter sounds, and reading skills.</p>
+      <div class="row g-4 justify-content-center" style="max-width:800px;margin:0 auto;">
+        <div class="col-md-6">
+          <div class="card border-0 shadow rounded-4 h-100 p-2">
+            <div class="card-body text-center p-4">
+              <div style="font-size:4rem;margin-bottom:1rem;">🔤</div>
+              <h4 class="fw-black mb-2">Phonics Alphabet Stories</h4>
+              <p class="text-muted mb-4">Explore every letter A–Z through colourful stories, sound activities, letter tracing and word discovery. Earn stars as you master each letter!</p>
+              <ul class="list-unstyled text-start small text-muted mb-4">
+                <li>✅ Interactive story for every letter</li>
+                <li>✅ Sound matching activities</li>
+                <li>✅ Letter tracing practice</li>
+                <li>✅ Star rewards &amp; progress tracking</li>
+              </ul>
+              <a href="phonics-alphabet-stories.html" class="btn btn-primary rounded-pill px-5 py-2 fw-bold fs-5 w-100">▶ Play Now</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card border-0 shadow rounded-4 h-100 p-2">
+            <div class="card-body text-center p-4">
+              <div style="font-size:4rem;margin-bottom:1rem;">🎯</div>
+              <h4 class="fw-black mb-2">Phonics Guessing Game</h4>
+              <p class="text-muted mb-4">See a picture, hear the sound clue, pick the right letter! Four exciting game modes — Story, Quiz, Speed Round and Custom Practice.</p>
+              <ul class="list-unstyled text-start small text-muted mb-4">
+                <li>✅ Multiple choice quiz format</li>
+                <li>✅ Timed speed challenge mode</li>
+                <li>✅ Custom letter selection</li>
+                <li>✅ Score tracking &amp; leaderboard</li>
+              </ul>
+              <a href="phonics-guessing-game.html" class="btn btn-success rounded-pill px-5 py-2 fw-bold fs-5 w-100">▶ Play Now</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="text-muted small mt-4">🔒 Log in to save your progress and scores across sessions.</p>
+    </div>
+  </section>
 </div>
 
 <!-- CONTACT US VIEW (open to all, no login) -->
@@ -168,9 +239,10 @@
             <label class="form-label small fw-semibold">I am signing up as</label>
             <select class="form-select" id="su_category">
               <option value="publisher">Publisher</option>
+              <option value="bookseller">Bookseller</option>
               <option value="school">School</option>
-              <option value="institution">Institution / Library</option>
               <option value="individual">Individual</option>
+              <option value="admin">Admin</option>
             </select>
           </div>
           <div class="mb-3">
@@ -215,11 +287,40 @@
       <h2 class="fw-bold mb-1">My Account</h2>
       <p class="text-muted mb-4" id="accountWelcome"></p>
 
-      <!-- Publisher: list a book -->
-      <div id="publisherPanel" style="display:none;">
+      <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-body p-4">
+          <h5 class="fw-bold mb-3">Profile management</h5>
+          <form id="profileForm" onsubmit="updateProfile(event)">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label small fw-semibold">Full name</label>
+                <input required class="form-control" id="profile_name">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label small fw-semibold">Organisation</label>
+                <input class="form-control" id="profile_org">
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label small fw-semibold">Phone</label>
+                <input class="form-control" id="profile_phone">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label small fw-semibold">Role</label>
+                <input class="form-control" id="profile_role" disabled>
+              </div>
+            </div>
+            <button class="btn btn-outline-primary rounded-pill px-4" type="submit">Save Profile</button>
+          </form>
+          <div id="profileSuccess" class="alert alert-success rounded-3 mt-3" style="display:none;">Profile updated.</div>
+        </div>
+      </div>
+
+      <div id="sellerPanel" style="display:none;">
         <div class="card border-0 shadow-sm rounded-4 mb-4">
           <div class="card-body p-4">
-            <h5 class="fw-bold mb-3">List a new book</h5>
+            <h5 class="fw-bold mb-3">List a new book (Publishers/Booksellers)</h5>
             <form id="publisherForm" onsubmit="submitListing(event)">
               <div class="mb-3">
                 <label class="form-label small fw-semibold">Book title</label>
@@ -241,11 +342,11 @@
               <div class="row">
                 <div class="col-md-6 mb-3">
                   <label class="form-label small fw-semibold">MRP (₹)</label>
-                  <input type="number" class="form-control" id="pub_mrp">
+                  <input type="number" min="0" step="0.01" class="form-control" id="pub_mrp">
                 </div>
                 <div class="col-md-6 mb-3">
                   <label class="form-label small fw-semibold">Offer price (₹)</label>
-                  <input type="number" class="form-control" id="pub_price">
+                  <input type="number" min="0" step="0.01" class="form-control" id="pub_price" required>
                 </div>
               </div>
               <div class="mb-3">
@@ -259,12 +360,12 @@
               <button class="btn btn-primary rounded-pill px-4" type="submit">Submit for Review</button>
             </form>
             <div id="publisherSuccess" class="alert alert-success rounded-3 mt-3" style="display:none;">
-              Submitted — pending our review against marketplace norms.
+              Submitted — pending moderation.
             </div>
           </div>
         </div>
         <h5 class="fw-bold mb-3">Your submissions</h5>
-        <div class="table-responsive">
+        <div class="table-responsive mb-4">
           <table class="table align-middle bg-white rounded-4 overflow-hidden shadow-sm">
             <thead class="table-light"><tr><th>Title</th><th>Price</th><th>Status</th></tr></thead>
             <tbody id="myListingsBody"></tbody>
@@ -272,32 +373,102 @@
         </div>
       </div>
 
-      <!-- Buyer: request a book -->
       <div id="buyerPanel" style="display:none;">
         <div class="card border-0 shadow-sm rounded-4 mb-4">
           <div class="card-body p-4">
             <h5 class="fw-bold mb-3">Request a book</h5>
             <form id="requestForm" onsubmit="submitRequest(event)">
-              <div class="mb-3">
-                <label class="form-label small fw-semibold">Book title (author/ISBN if known)</label>
-                <input required class="form-control" id="req_title">
+              <div class="row">
+                <div class="col-md-8 mb-3">
+                  <label class="form-label small fw-semibold">Book title (author/ISBN if known)</label>
+                  <input required class="form-control" id="req_title">
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label small fw-semibold">Quantity</label>
+                  <input required type="number" min="1" class="form-control" id="req_quantity" value="1">
+                </div>
               </div>
-              <div class="mb-3">
-                <label class="form-label small fw-semibold">Notes</label>
-                <textarea class="form-control" rows="3" id="req_notes" placeholder="Quantity, edition, deadline, etc."></textarea>
+              <div class="row">
+                <div class="col-md-4 mb-3">
+                  <label class="form-label small fw-semibold">Urgency</label>
+                  <select class="form-select" id="req_urgency">
+                    <option value="normal">Normal</option>
+                    <option value="urgent">Urgent</option>
+                    <option value="asap">ASAP</option>
+                  </select>
+                </div>
+                <div class="col-md-8 mb-3">
+                  <label class="form-label small fw-semibold">Notes</label>
+                  <textarea class="form-control" rows="1" id="req_notes" placeholder="Edition, delivery deadline, etc."></textarea>
+                </div>
               </div>
               <button class="btn btn-primary rounded-pill px-4" type="submit">Submit Request</button>
             </form>
             <div id="requestSuccess" class="alert alert-success rounded-3 mt-3" style="display:none;">
-              Request received — we'll get back to you.
+              Request received — status visible below.
             </div>
           </div>
         </div>
         <h5 class="fw-bold mb-3">Your requests</h5>
+        <div class="table-responsive mb-4">
+          <table class="table align-middle bg-white rounded-4 overflow-hidden shadow-sm">
+            <thead class="table-light"><tr><th>Book</th><th>Qty/Urgency</th><th>Status</th></tr></thead>
+            <tbody id="myRequestsBody"></tbody>
+          </table>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+          <div class="card-body p-4">
+            <h5 class="fw-bold mb-3">Create order</h5>
+            <form id="orderForm" onsubmit="submitOrder(event)">
+              <div class="row">
+                <div class="col-md-8 mb-3">
+                  <label class="form-label small fw-semibold">Select book</label>
+                  <select class="form-select" id="order_listing" required></select>
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label small fw-semibold">Quantity</label>
+                  <input required type="number" min="1" class="form-control" id="order_qty" value="1">
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label small fw-semibold">School / Buyer name</label>
+                  <input class="form-control" id="order_school" placeholder="Required for school bulk orders">
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label small fw-semibold">City</label>
+                  <input class="form-control" id="order_city">
+                </div>
+              </div>
+              <button class="btn btn-primary rounded-pill px-4" type="submit">Book Order</button>
+            </form>
+            <div id="orderSuccess" class="alert alert-success rounded-3 mt-3" style="display:none;">Order created and invoice generated.</div>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <h5 class="fw-bold mb-0">Orders & tracking</h5>
+          <select class="form-select form-select-sm" id="orderStatusFilter" style="max-width:220px;">
+            <option value="">All statuses</option>
+            <option value="pending">Pending</option>
+            <option value="processing">Processing</option>
+            <option value="shipped">Shipped</option>
+            <option value="delivered">Delivered</option>
+          </select>
+        </div>
+        <div class="table-responsive mb-4">
+          <table class="table align-middle bg-white rounded-4 overflow-hidden shadow-sm">
+            <thead class="table-light"><tr><th>Order</th><th>Total</th><th>Status</th><th>Tracking timeline</th></tr></thead>
+            <tbody id="myOrdersBody"></tbody>
+          </table>
+        </div>
+
+        <h5 class="fw-bold mb-3">Invoice history</h5>
         <div class="table-responsive">
           <table class="table align-middle bg-white rounded-4 overflow-hidden shadow-sm">
-            <thead class="table-light"><tr><th>Book</th><th>Notes</th><th>Status</th></tr></thead>
-            <tbody id="myRequestsBody"></tbody>
+            <thead class="table-light"><tr><th>Invoice</th><th>Amount</th><th>Status</th><th></th></tr></thead>
+            <tbody id="myInvoicesBody"></tbody>
           </table>
         </div>
       </div>
@@ -308,7 +479,13 @@
 <!-- ADMIN VIEW -->
 <div id="view-admin" class="view">
   <div class="container py-5">
-    <h2 class="fw-bold mb-4">Review Queue</h2>
+    <h2 class="fw-bold mb-2">Admin dashboard</h2>
+    <p class="text-muted mb-4">Moderation, requests, order processing, user management, and operations.</p>
+    <div class="row g-3 mb-4">
+      <div class="col-md-4"><a class="btn btn-outline-primary w-100 rounded-4 py-3" href="store-locator.html">Store locator</a></div>
+      <div class="col-md-4"><a class="btn btn-outline-primary w-100 rounded-4 py-3" href="careers.html">Careers / Job management</a></div>
+      <div class="col-md-4"><a class="btn btn-outline-primary w-100 rounded-4 py-3" href="users.html">Users management page</a></div>
+    </div>
     <h3 class="h6 fw-bold mb-3">Pending Publisher Listings</h3>
     <div class="table-responsive mb-5">
       <table class="table align-middle bg-white rounded-4 overflow-hidden shadow-sm">
@@ -319,8 +496,29 @@
     <h3 class="h6 fw-bold mb-3">Book Requests</h3>
     <div class="table-responsive mb-5">
       <table class="table align-middle bg-white rounded-4 overflow-hidden shadow-sm">
-        <thead class="table-light"><tr><th>Book</th><th>Notes</th><th>Status</th></tr></thead>
+        <thead class="table-light"><tr><th>Book</th><th>Requester</th><th>Status</th><th>Action</th></tr></thead>
         <tbody id="adminRequestsBody"></tbody>
+      </table>
+    </div>
+    <h3 class="h6 fw-bold mb-3">Orders management</h3>
+    <div class="table-responsive mb-5">
+      <table class="table align-middle bg-white rounded-4 overflow-hidden shadow-sm">
+        <thead class="table-light"><tr><th>Order</th><th>Buyer</th><th>Total</th><th>Status</th><th>Update</th></tr></thead>
+        <tbody id="adminOrdersBody"></tbody>
+      </table>
+    </div>
+    <h3 class="h6 fw-bold mb-3">Shipment tracking updates</h3>
+    <div class="table-responsive mb-5">
+      <table class="table align-middle bg-white rounded-4 overflow-hidden shadow-sm">
+        <thead class="table-light"><tr><th>Order</th><th>Carrier/Tracking</th><th>Current</th><th>Action</th></tr></thead>
+        <tbody id="adminShipmentsBody"></tbody>
+      </table>
+    </div>
+    <h3 class="h6 fw-bold mb-3">User management</h3>
+    <div class="table-responsive mb-5">
+      <table class="table align-middle bg-white rounded-4 overflow-hidden shadow-sm">
+        <thead class="table-light"><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th></tr></thead>
+        <tbody id="adminUsersBody"></tbody>
       </table>
     </div>
     <h3 class="h6 fw-bold mb-3">Contact Messages</h3>
@@ -343,15 +541,41 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-/* ============ CONFIG ============ */
 const SUPABASE_URL = "https://ebmzkpcujwwnqagbthby.supabase.co";
 const SUPABASE_KEY = "sb_publishable_mPwZfvEi6rZJ_TEHJ-qlUw_uxLpeZWZ";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let currentUser = null;
 let currentProfile = null;
+let activeCategory = null;
+let listingsCache = [];
+let invoiceCache = {};
+let realtimeChannel = null;
 
-/* ============ VIEW SWITCHING ============ */
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  }[char]));
+}
+
+function fmtMoney(value) {
+  const num = Number(value || 0);
+  return `₹${num.toFixed(2)}`;
+}
+
+function buildTimeline(status) {
+  const steps = ["pending", "processing", "shipped", "delivered"];
+  const current = steps.indexOf(status);
+  return steps.map((s, i) => {
+    const done = current >= i;
+    return `<span class="small ${done ? "text-dark fw-semibold" : "text-muted"}"><span class="timeline-dot me-1 ${done ? `status-${s}` : "bg-secondary-subtle"}"></span>${escapeHtml(s)}</span>`;
+  }).join(' <span class="text-muted">→</span> ');
+}
+
 function showView(name){
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById('view-' + name).classList.add('active');
@@ -367,45 +591,45 @@ function switchAuthTab(tab){
   document.getElementById('tabSignupBtn').className = 'btn ' + (tab==='signup' ? 'btn-primary' : 'btn-outline-primary') + ' rounded-pill px-4';
 }
 
-/* ============ AUTH ============ */
 async function refreshSession(){
   const { data: { session } } = await sb.auth.getSession();
   currentUser = session ? session.user : null;
+  currentProfile = null;
   if(currentUser){
-    const { data: profile } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
-    currentProfile = profile;
-  } else {
-    currentProfile = null;
+    const { data: profile } = await sb.from('profiles').select('*').eq('id', currentUser.id).maybeSingle();
+    currentProfile = profile || null;
   }
   updateNav();
+  setupRealtime();
 }
 
 function updateNav(){
   document.getElementById('navAuth').style.display = currentUser ? 'none' : 'block';
   document.getElementById('navLogout').style.display = currentUser ? 'block' : 'none';
-  document.getElementById('navAdmin').style.display = (currentProfile && currentProfile.is_admin) ? 'block' : 'none';
+  const isAdmin = !!(currentProfile && (currentProfile.is_admin || currentProfile.category === 'admin'));
+  document.getElementById('navAdmin').style.display = isAdmin ? 'block' : 'none';
 }
 
 async function doSignup(e){
   e.preventDefault();
-  const email = document.getElementById('su_email').value;
+  const email = document.getElementById('su_email').value.trim();
   const password = document.getElementById('su_password').value;
   const category = document.getElementById('su_category').value;
-  const full_name = document.getElementById('su_name').value;
-  const organisation = document.getElementById('su_org').value;
-  const phone = document.getElementById('su_phone').value;
+  const full_name = document.getElementById('su_name').value.trim();
+  const organisation = document.getElementById('su_org').value.trim();
+  const phone = document.getElementById('su_phone').value.trim();
+  const is_admin = category === 'admin';
 
   document.getElementById('signupError').textContent = '';
+  document.getElementById('signupSuccess').style.display = 'none';
   const { data, error } = await sb.auth.signUp({ email, password });
   if(error){ document.getElementById('signupError').textContent = error.message; return; }
 
   if(data.user){
-    await sb.from('profiles').insert({
-      id: data.user.id, category, full_name, organisation, phone
-    });
+    const { error: profileError } = await sb.from('profiles').insert({ id: data.user.id, category, full_name, organisation, phone, is_admin });
+    if(profileError){ document.getElementById('signupError').textContent = profileError.message; return; }
   }
   document.getElementById('signupSuccess').style.display = 'block';
-  document.getElementById('publisherForm') && null;
   e.target.reset();
 }
 
@@ -421,22 +645,20 @@ async function doLogin(e){
 }
 
 async function doLogout(){
+  if (realtimeChannel) {
+    await sb.removeChannel(realtimeChannel);
+    realtimeChannel = null;
+  }
   await sb.auth.signOut();
   await refreshSession();
   showView('browse');
 }
 
-/* ============ BROWSE (public) ============ */
-let activeCategory = null;
 async function renderBrowse(){
   const q = (document.getElementById('searchBox').value || '').toLowerCase();
-  let query = sb.from('listings').select('*').eq('status', 'approved');
-  const { data: listings, error } = await query;
-  const grid = document.getElementById('bookGrid');
-  const empty = document.getElementById('emptyState');
-
-  const all = listings || [];
-  const cats = Array.from(new Set(all.map(b => b.category).filter(Boolean)));
+  const { data: listings } = await sb.from('listings').select('*').eq('status', 'approved').order('created_at', { ascending: false });
+  listingsCache = listings || [];
+  const cats = Array.from(new Set(listingsCache.map(b => b.category).filter(Boolean)));
   const filterRow = document.getElementById('filterRow');
   filterRow.innerHTML = '';
   const allBtn = document.createElement('button');
@@ -452,29 +674,31 @@ async function renderBrowse(){
     filterRow.appendChild(b);
   });
 
-  let list = all.filter(b => {
+  const list = listingsCache.filter(b => {
     if(activeCategory && b.category !== activeCategory) return false;
-    if(q && !(b.title.toLowerCase().includes(q) || (b.category||'').toLowerCase().includes(q))) return false;
+    if(q && !(String(b.title || '').toLowerCase().includes(q) || String(b.category||'').toLowerCase().includes(q))) return false;
     return true;
   });
 
+  const grid = document.getElementById('bookGrid');
+  const empty = document.getElementById('emptyState');
   grid.innerHTML = '';
   empty.style.display = list.length === 0 ? 'block' : 'none';
 
   list.forEach(b => {
     const col = document.createElement('div');
     col.className = 'col-6 col-md-4 col-lg-3';
+    const title = escapeHtml(b.title);
+    const img = b.image_url ? `<img src="${escapeHtml(b.image_url)}" alt="${title}">` : `<span class="text-muted small px-3 text-center">${title}</span>`;
     col.innerHTML = `
       <div class="card h-100 border-0 shadow-sm book-card">
-        <div class="book-cover">
-          ${b.image_url ? `<img src="${b.image_url}" alt="${b.title}">` : `<span class="text-muted small px-3 text-center">${b.title}</span>`}
-        </div>
+        <div class="book-cover">${img}</div>
         <div class="card-body">
           <div class="mb-2"><span class="tag-pill ${b.origin === 'Foreign' ? 'foreign' : ''}">${b.origin === 'Foreign' ? '🌍 Foreign' : '🇮🇳 Indian'}</span></div>
-          <h6 class="fw-bold mb-2">${b.title}</h6>
+          <h6 class="fw-bold mb-2">${title}</h6>
           <div class="d-flex align-items-baseline gap-2">
-            <span class="price-now">₹${b.price}</span>
-            ${b.mrp && b.mrp != b.price ? `<span class="price-orig">₹${b.mrp}</span>` : ''}
+            <span class="price-now">${fmtMoney(b.price)}</span>
+            ${b.mrp && Number(b.mrp) !== Number(b.price) ? `<span class="price-orig">${fmtMoney(b.mrp)}</span>` : ''}
           </div>
         </div>
       </div>`;
@@ -483,20 +707,27 @@ async function renderBrowse(){
 }
 document.getElementById('searchBox').addEventListener('input', renderBrowse);
 
-/* ============ CONTACT (public, no login) ============ */
 async function submitContact(e){
   e.preventDefault();
-  await sb.from('contact_requests').insert({
-    name: document.getElementById('c_name').value,
-    email: document.getElementById('c_email').value,
-    phone: document.getElementById('c_phone').value,
-    message: document.getElementById('c_message').value
+  const { error } = await sb.from('contact_requests').insert({
+    name: document.getElementById('c_name').value.trim(),
+    email: document.getElementById('c_email').value.trim(),
+    phone: document.getElementById('c_phone').value.trim(),
+    message: document.getElementById('c_message').value.trim()
   });
+  if (error) return alert(error.message);
   document.getElementById('contactForm').reset();
   document.getElementById('contactSuccess').style.display = 'block';
 }
 
-/* ============ MY ACCOUNT (members only) ============ */
+function profileRole() {
+  return (currentProfile?.category || 'individual').toLowerCase();
+}
+
+function isAdmin() {
+  return !!(currentProfile && (currentProfile.is_admin || currentProfile.category === 'admin'));
+}
+
 async function renderAccount(){
   if(!currentUser || !currentProfile){
     document.getElementById('accountLocked').style.display = 'block';
@@ -505,44 +736,81 @@ async function renderAccount(){
   }
   document.getElementById('accountLocked').style.display = 'none';
   document.getElementById('accountContent').style.display = 'block';
-  document.getElementById('accountWelcome').textContent =
-    `Logged in as ${currentProfile.full_name || currentUser.email} (${currentProfile.category})`;
+  document.getElementById('accountWelcome').textContent = `Logged in as ${currentProfile.full_name || currentUser.email} (${profileRole()})`;
 
-  const isPublisher = currentProfile.category === 'publisher';
-  document.getElementById('publisherPanel').style.display = isPublisher ? 'block' : 'none';
-  document.getElementById('buyerPanel').style.display = isPublisher ? 'none' : 'block';
+  document.getElementById('profile_name').value = currentProfile.full_name || '';
+  document.getElementById('profile_org').value = currentProfile.organisation || '';
+  document.getElementById('profile_phone').value = currentProfile.phone || '';
+  document.getElementById('profile_role').value = profileRole();
 
-  if(isPublisher){
-    const { data } = await sb.from('listings').select('*').eq('publisher_id', currentUser.id).order('created_at', {ascending:false});
-    const body = document.getElementById('myListingsBody');
-    body.innerHTML = '';
-    (data||[]).forEach(l => {
-      body.innerHTML += `<tr><td>${l.title}</td><td>₹${l.price||'—'}</td><td><span class="badge status-${l.status} rounded-pill px-3 py-2">${l.status}</span></td></tr>`;
-    });
-    if(!data || data.length===0) body.innerHTML = '<tr><td colspan="3" class="text-center text-muted py-3">No submissions yet.</td></tr>';
-  } else {
-    const { data } = await sb.from('book_requests').select('*').eq('requester_id', currentUser.id).order('created_at', {ascending:false});
-    const body = document.getElementById('myRequestsBody');
-    body.innerHTML = '';
-    (data||[]).forEach(r => {
-      body.innerHTML += `<tr><td>${r.book_title}</td><td class="small">${r.notes||''}</td><td><span class="badge status-approved rounded-pill px-3 py-2">${r.status}</span></td></tr>`;
-    });
-    if(!data || data.length===0) body.innerHTML = '<tr><td colspan="3" class="text-center text-muted py-3">No requests yet.</td></tr>';
+  const role = profileRole();
+  const isSeller = role === 'publisher' || role === 'bookseller';
+  const isBuyer = role === 'school' || role === 'individual';
+  document.getElementById('sellerPanel').style.display = isSeller ? 'block' : 'none';
+  document.getElementById('buyerPanel').style.display = isBuyer ? 'block' : 'none';
+
+  if (isSeller) await renderMyListings();
+  if (isBuyer) {
+    await renderMyRequests();
+    await loadOrderListingOptions();
+    await renderMyOrdersAndInvoices();
   }
+}
+
+async function updateProfile(e) {
+  e.preventDefault();
+  const updates = {
+    full_name: document.getElementById('profile_name').value.trim(),
+    organisation: document.getElementById('profile_org').value.trim(),
+    phone: document.getElementById('profile_phone').value.trim()
+  };
+  const { error } = await sb.from('profiles').update(updates).eq('id', currentUser.id);
+  if (error) return alert(error.message);
+  currentProfile = { ...currentProfile, ...updates };
+  document.getElementById('profileSuccess').style.display = 'block';
+}
+
+async function renderMyListings() {
+  const { data } = await sb.from('listings').select('*').eq('publisher_id', currentUser.id).order('created_at', {ascending:false});
+  const body = document.getElementById('myListingsBody');
+  body.innerHTML = '';
+  (data||[]).forEach(l => {
+    body.innerHTML += `<tr><td>${escapeHtml(l.title)}</td><td>${fmtMoney(l.price || 0)}</td><td><span class="badge status-${escapeHtml(l.status)} rounded-pill px-3 py-2">${escapeHtml(l.status)}</span></td></tr>`;
+  });
+  if(!data || data.length===0) body.innerHTML = '<tr><td colspan="3" class="text-center text-muted py-3">No submissions yet.</td></tr>';
+}
+
+async function renderMyRequests() {
+  const { data } = await sb.from('book_requests').select('*').eq('requester_id', currentUser.id).order('created_at', {ascending:false});
+  const body = document.getElementById('myRequestsBody');
+  body.innerHTML = '';
+  (data||[]).forEach(r => {
+    body.innerHTML += `<tr><td>${escapeHtml(r.book_title)}</td><td class="small">${escapeHtml(r.quantity || 1)} / ${escapeHtml(r.urgency || "normal")}</td><td><span class="badge rounded-pill px-3 py-2 status-${escapeHtml(r.status === "in_progress" ? "processing" : r.status === "fulfilled" ? "delivered" : "pending")}">${escapeHtml(r.status)}</span></td></tr>`;
+  });
+  if(!data || data.length===0) body.innerHTML = '<tr><td colspan="3" class="text-center text-muted py-3">No requests yet.</td></tr>';
+}
+
+async function loadOrderListingOptions() {
+  const select = document.getElementById('order_listing');
+  const approved = listingsCache.length ? listingsCache : (await sb.from('listings').select('*').eq('status', 'approved')).data || [];
+  select.innerHTML = approved.map(l => `<option value="${escapeHtml(l.id)}" data-price="${escapeHtml(l.price)}">${escapeHtml(l.title)} (${fmtMoney(l.price)})</option>`).join('');
 }
 
 async function submitListing(e){
   e.preventDefault();
-  await sb.from('listings').insert({
+  const payload = {
     publisher_id: currentUser.id,
-    title: document.getElementById('pub_title').value,
-    category: document.getElementById('pub_category').value,
+    title: document.getElementById('pub_title').value.trim(),
+    category: document.getElementById('pub_category').value.trim(),
     origin: document.getElementById('pub_origin').value,
     mrp: document.getElementById('pub_mrp').value || null,
-    price: document.getElementById('pub_price').value || null,
-    image_url: document.getElementById('pub_image').value,
-    description: document.getElementById('pub_desc').value
-  });
+    price: Number(document.getElementById('pub_price').value),
+    image_url: document.getElementById('pub_image').value.trim(),
+    description: document.getElementById('pub_desc').value.trim(),
+    status: "pending"
+  };
+  const { error } = await sb.from('listings').insert(payload);
+  if (error) return alert(error.message);
   document.getElementById('publisherForm').reset();
   document.getElementById('publisherSuccess').style.display = 'block';
   renderAccount();
@@ -550,53 +818,204 @@ async function submitListing(e){
 
 async function submitRequest(e){
   e.preventDefault();
-  await sb.from('book_requests').insert({
+  const payload = {
     requester_id: currentUser.id,
-    book_title: document.getElementById('req_title').value,
-    notes: document.getElementById('req_notes').value
-  });
+    book_title: document.getElementById('req_title').value.trim(),
+    notes: document.getElementById('req_notes').value.trim(),
+    quantity: Number(document.getElementById('req_quantity').value || 1),
+    urgency: document.getElementById('req_urgency').value,
+    status: "open"
+  };
+  const { error } = await sb.from('book_requests').insert(payload);
+  if (error) return alert(error.message);
   document.getElementById('requestForm').reset();
   document.getElementById('requestSuccess').style.display = 'block';
-  renderAccount();
+  renderMyRequests();
 }
 
-/* ============ ADMIN ============ */
+function makeOrderNumber() {
+  const now = new Date();
+  return `ORD-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}-${Math.floor(Math.random() * 90000 + 10000)}`;
+}
+
+function makeInvoiceNumber() {
+  const now = new Date();
+  return `INV-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}-${Math.floor(Math.random() * 90000 + 10000)}`;
+}
+
+async function submitOrder(e) {
+  e.preventDefault();
+  const listingId = document.getElementById('order_listing').value;
+  const qty = Number(document.getElementById('order_qty').value);
+  if (!listingId || qty < 1) return;
+  const listing = (listingsCache || []).find((l) => l.id === listingId);
+  if (!listing) return alert("Please select a valid listing.");
+  const subtotal = Number(listing.price) * qty;
+  const gst = Number((subtotal * 0.05).toFixed(2));
+  const total = Number((subtotal + gst).toFixed(2));
+  const order_number = makeOrderNumber();
+  const { data: orderRows, error: orderError } = await sb.from('orders').insert({
+    order_number,
+    buyer_id: currentUser.id,
+    school_name: document.getElementById('order_school').value.trim() || null,
+    city: document.getElementById('order_city').value.trim() || null,
+    state: null,
+    total_amount: total,
+    gst_amount: gst,
+    status: "pending"
+  }).select('id').limit(1);
+  if (orderError) return alert(orderError.message);
+  const orderId = orderRows?.[0]?.id;
+  if (!orderId) return alert("Unable to create order.");
+
+  const { error: itemError } = await sb.from('order_items').insert({
+    order_id: orderId,
+    listing_id: listingId,
+    book_title: listing.title,
+    quantity: qty,
+    unit_price: listing.price,
+    line_total: subtotal
+  });
+  if (itemError) return alert(itemError.message);
+
+  const invoice_number = makeInvoiceNumber();
+  const { error: invoiceError } = await sb.from('invoices').insert({
+    order_id: orderId,
+    invoice_number,
+    subtotal,
+    gst_rate: 5,
+    gst_amount: gst,
+    grand_total: total,
+    status: "issued"
+  });
+  if (invoiceError) return alert(invoiceError.message);
+
+  await sb.from('shipments').insert({ order_id: orderId, status: "pending" });
+  document.getElementById('orderForm').reset();
+  document.getElementById('orderSuccess').style.display = 'block';
+  renderMyOrdersAndInvoices();
+}
+
+async function renderMyOrdersAndInvoices() {
+  const filter = document.getElementById('orderStatusFilter').value;
+  let query = sb.from('orders').select('*').eq('buyer_id', currentUser.id).order('created_at', { ascending: false });
+  if (filter) query = query.eq('status', filter);
+  const { data: orders } = await query;
+  const orderIds = (orders || []).map((o) => o.id);
+
+  let shipmentsMap = {};
+  if (orderIds.length) {
+    const { data: shipments } = await sb.from('shipments').select('*').in('order_id', orderIds);
+    shipmentsMap = Object.fromEntries((shipments || []).map((s) => [s.order_id, s]));
+  }
+
+  const body = document.getElementById('myOrdersBody');
+  body.innerHTML = '';
+  (orders || []).forEach(o => {
+    const shipment = shipmentsMap[o.id] || {};
+    const tracking = shipment.tracking_number ? `#${escapeHtml(shipment.tracking_number)} (${escapeHtml(shipment.carrier || "Carrier pending")})` : "Pending dispatch";
+    body.innerHTML += `<tr><td><strong>${escapeHtml(o.order_number)}</strong><br><span class="small text-muted">${tracking}</span></td><td>${fmtMoney(o.total_amount)}</td><td><span class="badge rounded-pill px-3 py-2 status-${escapeHtml(o.status)}">${escapeHtml(o.status)}</span></td><td class="small">${buildTimeline(shipment.status || o.status)}</td></tr>`;
+  });
+  if (!orders || orders.length === 0) body.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-3">No orders yet.</td></tr>';
+
+  const { data: invoices } = orderIds.length ? await sb.from('invoices').select('*').in('order_id', orderIds).order('issued_at', { ascending: false }) : { data: [] };
+  invoiceCache = Object.fromEntries((invoices || []).map((i) => [i.id, i]));
+  const ib = document.getElementById('myInvoicesBody');
+  ib.innerHTML = '';
+  (invoices || []).forEach(inv => {
+    ib.innerHTML += `<tr><td>${escapeHtml(inv.invoice_number)}</td><td>${fmtMoney(inv.grand_total)}</td><td>${escapeHtml(inv.status)}</td><td><button class="btn btn-sm btn-outline-primary rounded-pill" onclick="downloadInvoicePdf('${escapeHtml(inv.id)}')">Download PDF</button></td></tr>`;
+  });
+  if (!invoices || invoices.length === 0) ib.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-3">No invoices yet.</td></tr>';
+}
+
+function downloadInvoicePdf(invoiceId) {
+  const inv = invoiceCache[invoiceId];
+  if (!inv) return;
+  const html = `
+    <html><head><title>${escapeHtml(inv.invoice_number)}</title></head>
+    <body style="font-family:Arial,sans-serif;padding:24px;">
+      <h2>Books at Doorsteps - Invoice</h2>
+      <p><strong>Invoice:</strong> ${escapeHtml(inv.invoice_number)}</p>
+      <p><strong>Issued:</strong> ${new Date(inv.issued_at).toLocaleString()}</p>
+      <hr>
+      <p>Subtotal: ${fmtMoney(inv.subtotal)}</p>
+      <p>GST (${Number(inv.gst_rate || 5).toFixed(2)}%): ${fmtMoney(inv.gst_amount)}</p>
+      <h3>Total: ${fmtMoney(inv.grand_total)}</h3>
+    </body></html>`;
+  const win = window.open('', '_blank');
+  win.document.write(html);
+  win.document.close();
+  win.focus();
+  win.print();
+}
+
 async function renderAdmin(){
-  if(!currentProfile || !currentProfile.is_admin) return;
+  if(!isAdmin()) return;
 
   const { data: pending } = await sb.from('listings').select('*').eq('status','pending').order('created_at');
   const lb = document.getElementById('adminListingsBody');
   lb.innerHTML = '';
   (pending||[]).forEach(item => {
-    lb.innerHTML += `
-      <tr>
-        <td><strong>${item.title}</strong><br><span class="small text-muted">${item.category||''}</span></td>
-        <td>${item.origin||''}</td>
-        <td>₹${item.price||'—'} <span class="small text-muted">(MRP ₹${item.mrp||'—'})</span></td>
-        <td><span class="badge status-pending rounded-pill px-3 py-2">Pending</span></td>
-        <td>
-          <button class="btn btn-sm btn-success rounded-pill me-1" onclick="approveListing('${item.id}')">Approve</button>
-          <button class="btn btn-sm btn-outline-danger rounded-pill" onclick="rejectListing('${item.id}')">Reject</button>
-        </td>
-      </tr>`;
+    lb.innerHTML += `<tr><td><strong>${escapeHtml(item.title)}</strong><br><span class="small text-muted">${escapeHtml(item.category||'')}</span></td><td>${escapeHtml(item.origin||'')}</td><td>${fmtMoney(item.price||0)} <span class="small text-muted">(MRP ${fmtMoney(item.mrp||0)})</span></td><td><span class="badge status-pending rounded-pill px-3 py-2">Pending</span></td><td><button class="btn btn-sm btn-success rounded-pill me-1" onclick="approveListing('${escapeHtml(item.id)}')">Approve</button><button class="btn btn-sm btn-outline-danger rounded-pill" onclick="rejectListing('${escapeHtml(item.id)}')">Reject</button></td></tr>`;
   });
   if(!pending || pending.length===0) lb.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-3">No pending submissions.</td></tr>';
 
-  const { data: requests } = await sb.from('book_requests').select('*').order('created_at', {ascending:false});
+  const { data: requests } = await sb.from('book_requests').select('id,book_title,status,requester_id,quantity,urgency').order('created_at', {ascending:false}).limit(50);
   const rb = document.getElementById('adminRequestsBody');
   rb.innerHTML = '';
   (requests||[]).forEach(r => {
-    rb.innerHTML += `<tr><td>${r.book_title}</td><td class="small">${r.notes||''}</td><td>${r.status}</td></tr>`;
+    rb.innerHTML += `<tr><td>${escapeHtml(r.book_title)}<br><span class="small text-muted">Qty ${escapeHtml(r.quantity || 1)} · ${escapeHtml(r.urgency || "normal")}</span></td><td class="small">${escapeHtml(r.requester_id)}</td><td>${escapeHtml(r.status)}</td><td><select class="form-select form-select-sm d-inline-block w-auto me-2" id="req-status-${escapeHtml(r.id)}"><option value="open">open</option><option value="in_progress">in_progress</option><option value="fulfilled">fulfilled</option><option value="rejected">rejected</option><option value="closed">closed</option></select><button class="btn btn-sm btn-outline-primary rounded-pill" onclick="updateRequestStatus('${escapeHtml(r.id)}')">Save</button></td></tr>`;
+    setTimeout(() => {
+      const sel = document.getElementById(`req-status-${r.id}`);
+      if (sel) sel.value = r.status;
+    }, 0);
   });
-  if(!requests || requests.length===0) rb.innerHTML = '<tr><td colspan="3" class="text-center text-muted py-3">No requests yet.</td></tr>';
+  if(!requests || requests.length===0) rb.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-3">No requests yet.</td></tr>';
 
-  const { data: contacts } = await sb.from('contact_requests').select('*').order('created_at', {ascending:false});
+  const { data: orders } = await sb.from('orders').select('*').order('created_at', { ascending: false }).limit(100);
+  const ob = document.getElementById('adminOrdersBody');
+  ob.innerHTML = '';
+  (orders || []).forEach(o => {
+    ob.innerHTML += `<tr><td>${escapeHtml(o.order_number)}</td><td class="small">${escapeHtml(o.buyer_id)}</td><td>${fmtMoney(o.total_amount)}</td><td><span class="badge rounded-pill px-3 py-2 status-${escapeHtml(o.status)}">${escapeHtml(o.status)}</span></td><td><select class="form-select form-select-sm d-inline-block w-auto me-2" id="order-status-${escapeHtml(o.id)}"><option value="pending">pending</option><option value="processing">processing</option><option value="shipped">shipped</option><option value="delivered">delivered</option><option value="cancelled">cancelled</option></select><button class="btn btn-sm btn-outline-primary rounded-pill" onclick="updateOrderStatus('${escapeHtml(o.id)}')">Update</button></td></tr>`;
+    setTimeout(() => {
+      const sel = document.getElementById(`order-status-${o.id}`);
+      if (sel) sel.value = o.status;
+    }, 0);
+  });
+  if(!orders || orders.length===0) ob.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-3">No orders yet.</td></tr>';
+
+  const orderIds = (orders || []).map(o => o.id);
+  const { data: shipments } = orderIds.length ? await sb.from('shipments').select('*').in('order_id', orderIds) : { data: [] };
+  const shipByOrder = Object.fromEntries((shipments || []).map(s => [s.order_id, s]));
+  const sbdy = document.getElementById('adminShipmentsBody');
+  sbdy.innerHTML = '';
+  (orders || []).forEach(o => {
+    const s = shipByOrder[o.id] || {};
+    sbdy.innerHTML += `<tr><td>${escapeHtml(o.order_number)}</td><td><input class="form-control form-control-sm mb-1" id="carrier-${escapeHtml(o.id)}" value="${escapeHtml(s.carrier || "")}" placeholder="Carrier"><input class="form-control form-control-sm" id="tracking-${escapeHtml(o.id)}" value="${escapeHtml(s.tracking_number || "")}" placeholder="Tracking #"></td><td><input class="form-control form-control-sm" id="location-${escapeHtml(o.id)}" value="${escapeHtml(s.current_location || "")}" placeholder="Current location"></td><td><button class="btn btn-sm btn-outline-primary rounded-pill" onclick="saveShipment('${escapeHtml(o.id)}', '${escapeHtml(s.id || "")}')">Save</button></td></tr>`;
+  });
+  if (!orders || orders.length === 0) sbdy.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-3">No shipments yet.</td></tr>';
+
+  const { data: users } = await sb.from('profiles').select('id,full_name,category,status').order('created_at', { ascending: false }).limit(100);
+  const ub = document.getElementById('adminUsersBody');
+  ub.innerHTML = '';
+  (users || []).forEach(u => {
+    ub.innerHTML += `<tr><td>${escapeHtml(u.full_name || "—")}</td><td class="small">${escapeHtml(u.id)}</td><td>${escapeHtml(u.category || "—")}</td><td>${escapeHtml(u.status || "active")}</td></tr>`;
+  });
+  if(!users || users.length===0) ub.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-3">No users found.</td></tr>';
+
+  const { data: contacts } = await sb.from('contact_requests').select('*').order('created_at', {ascending:false}).limit(100);
   const cb = document.getElementById('adminContactBody');
   cb.innerHTML = '';
   (contacts||[]).forEach(c => {
-    cb.innerHTML += `<tr><td>${c.name}</td><td class="small">${c.email||''}<br>${c.phone||''}</td><td class="small">${c.message}</td><td class="small text-muted">${new Date(c.created_at).toLocaleString()}</td></tr>`;
+    cb.innerHTML += `<tr><td>${escapeHtml(c.name)}</td><td class="small">${escapeHtml(c.email||'')}<br>${escapeHtml(c.phone||'')}</td><td class="small">${escapeHtml(c.message)}</td><td class="small text-muted">${new Date(c.created_at).toLocaleString()}</td></tr>`;
   });
   if(!contacts || contacts.length===0) cb.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-3">No messages yet.</td></tr>';
+}
+
+async function updateRequestStatus(id) {
+  const status = document.getElementById(`req-status-${id}`).value;
+  await sb.from('book_requests').update({ status }).eq('id', id);
+  renderAdmin();
 }
 
 async function approveListing(id){
@@ -608,7 +1027,44 @@ async function rejectListing(id){
   renderAdmin();
 }
 
-/* ============ INIT ============ */
+async function updateOrderStatus(orderId) {
+  const status = document.getElementById(`order-status-${orderId}`).value;
+  await sb.from('orders').update({ status }).eq('id', orderId);
+  const shipmentStatus = ["pending", "processing", "shipped", "delivered"].includes(status) ? status : "processing";
+  await sb.from('shipments').upsert({ order_id: orderId, status: shipmentStatus }, { onConflict: "order_id" });
+  renderAdmin();
+  if (document.getElementById('view-account').classList.contains('active')) renderMyOrdersAndInvoices();
+}
+
+async function saveShipment(orderId, shipmentId) {
+  const carrier = document.getElementById(`carrier-${orderId}`).value.trim();
+  const tracking_number = document.getElementById(`tracking-${orderId}`).value.trim();
+  const current_location = document.getElementById(`location-${orderId}`).value.trim();
+  const status = tracking_number ? "shipped" : "processing";
+  const payload = { order_id: orderId, carrier: carrier || null, tracking_number: tracking_number || null, current_location: current_location || null, status, shipped_at: status === "shipped" ? new Date().toISOString() : null };
+  if (shipmentId) payload.id = shipmentId;
+  await sb.from('shipments').upsert(payload, { onConflict: "order_id" });
+  await sb.from('orders').update({ status }).eq('id', orderId);
+  renderAdmin();
+}
+
+function setupRealtime() {
+  if (realtimeChannel) sb.removeChannel(realtimeChannel);
+  realtimeChannel = sb.channel('booksatdoorsteps-live-updates')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => onRealtimeUpdate())
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'shipments' }, () => onRealtimeUpdate())
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'book_requests' }, () => onRealtimeUpdate())
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'listings' }, () => onRealtimeUpdate())
+    .subscribe();
+}
+
+function onRealtimeUpdate() {
+  if (document.getElementById('view-account').classList.contains('active')) renderAccount();
+  if (document.getElementById('view-admin').classList.contains('active')) renderAdmin();
+  if (document.getElementById('view-browse').classList.contains('active')) renderBrowse();
+}
+
+document.getElementById('orderStatusFilter').addEventListener('change', renderMyOrdersAndInvoices);
 refreshSession().then(renderBrowse);
 </script>
 </body>
