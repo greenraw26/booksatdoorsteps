@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>Phonics Alphabet Stories — Books at Doorsteps</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --dd-primary: #4f46e5;
+  --dd-primary-soft: #eef2ff;
+  --dd-pink: #fb7185;
+  --dd-yellow: #facc15;
+  --dd-green: #22c55e;
+  --dd-orange: #f97316;
+  --dd-bg: #f4f5fb;
+}
+* { box-sizing: border-box; }
+body { font-family: "Nunito", sans-serif; background: var(--dd-bg); }
+.brand-badge {
+  width: 32px; height: 32px; border-radius: 999px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 0.85rem;
+  background: linear-gradient(135deg, #4f46e5, #fb7185); color: white;
+}
+footer { background: #111827; color: #d1d5db; }
+
+/* Alphabet Selector */
+.letter-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 0.5rem; }
+.letter-btn {
+  aspect-ratio: 1; border-radius: 1rem; border: 3px solid transparent;
+  font-size: 1.5rem; font-weight: 900; cursor: pointer;
+  background: white; transition: all .2s;
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 2px; box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+.letter-btn:hover { transform: scale(1.08); }
+.letter-btn.mastered { background: #dcfce7; border-color: #22c55e; }
+.letter-btn.current { background: var(--dd-primary-soft); border-color: var(--dd-primary); }
+.letter-btn .star-row { font-size: 0.55rem; line-height: 1; }
+
+/* Story Card */
+.story-card {
+  background: white; border-radius: 2rem; padding: 2rem;
+  box-shadow: 0 8px 32px rgba(79,70,229,.08);
+}
+.letter-hero {
+  font-size: 8rem; font-weight: 900; line-height: 1;
+  background: linear-gradient(135deg, var(--dd-primary), var(--dd-pink));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  user-select: none;
+}
+.emoji-hero { font-size: 6rem; animation: bounce 1.2s infinite alternate; }
+@keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-12px); } }
+
+/* Activity Tabs */
+.activity-tab {
+  border-radius: 999px; border: 2px solid transparent; padding: .4rem 1.1rem;
+  font-weight: 700; font-size: .88rem; cursor: pointer; background: #f3f4f6;
+  transition: all .2s;
+}
+.activity-tab.active { background: var(--dd-primary); color: white; border-color: var(--dd-primary); }
+.activity-pane { display: none; }
+.activity-pane.active { display: block; }
+
+/* Sound Match */
+.choice-btn {
+  font-size: 2.5rem; font-weight: 900; border-radius: 1.25rem;
+  border: 3px solid #e5e7eb; background: white; cursor: pointer;
+  padding: 1rem; transition: all .2s; width: 100%;
+  box-shadow: 0 2px 8px rgba(0,0,0,.06);
+}
+.choice-btn:hover { transform: scale(1.05); border-color: var(--dd-primary); }
+.choice-btn.correct { background: #dcfce7; border-color: #22c55e; }
+.choice-btn.wrong { background: #fee2e2; border-color: #ef4444; }
+
+/* Canvas tracing */
+#traceCanvas {
+  border-radius: 1rem; cursor: crosshair;
+  border: 3px dashed #c7d2fe; background: #f8f9ff;
+  touch-action: none;
+}
+
+/* Words discovery */
+.word-card {
+  background: white; border-radius: 1.25rem; padding: 1.25rem;
+  text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,.07);
+  cursor: pointer; transition: transform .2s;
+}
+.word-card:hover { transform: translateY(-3px); }
+.word-emoji { font-size: 2.5rem; }
+.word-text { font-size: 1.1rem; font-weight: 800; margin-top: 0.4rem; }
+.word-highlight { color: var(--dd-primary); }
+
+/* Progress bar */
+.prog-bar { height: 12px; border-radius: 999px; background: #e5e7eb; overflow: hidden; }
+.prog-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--dd-primary), var(--dd-pink)); transition: width .6s ease; }
+
+/* Stars */
+.star { color: #d1d5db; font-size: 1.4rem; transition: color .3s; }
+.star.earned { color: var(--dd-yellow); }
+
+/* Celebration */
+.celebrate { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; pointer-events: none; }
+canvas#confetti { width: 100%; height: 100%; }
+
+/* Login gate */
+.locked-banner { background: #fff7ed; border: 1px solid #fed7aa; color: #9a3412; border-radius: 1rem; padding: 1rem 1.25rem; }
+
+/* Responsive */
+@media (max-width: 576px) {
+  .letter-hero { font-size: 5rem; }
+  .emoji-hero { font-size: 4rem; }
+  .letter-grid { grid-template-columns: repeat(auto-fill, minmax(48px, 1fr)); }
+}
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+  <div class="container">
+    <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="booksatdoorsteps_live.html">
+      <span class="brand-badge">BD</span>
+      <span>Books at <span class="text-primary">Doorsteps</span></span>
+    </a>
+    <div class="d-flex align-items-center gap-3">
+      <span class="badge bg-primary rounded-pill px-3 py-2">🔤 Phonics Stories</span>
+      <a href="phonics-guessing-game.html" class="btn btn-outline-primary rounded-pill btn-sm px-3">Guessing Game →</a>
+      <span id="userBadge" class="badge bg-success rounded-pill px-3 py-2 d-none"></span>
+    </div>
+  </div>
+</nav>
+
+<!-- Celebration Canvas -->
+<div class="celebrate" id="celebrateDiv">
+  <canvas id="confetti"></canvas>
+</div>
+
+<div class="container py-4">
+
+  <!-- Login Gate -->
+  <div id="loginGate" class="locked-banner mb-4 d-none">
+    🔒 Please <a href="booksatdoorsteps_live.html" class="fw-bold">log in or sign up</a> to save your progress. You can still play as a guest!
+  </div>
+
+  <!-- Header -->
+  <div class="text-center mb-4">
+    <h1 class="fw-black" style="font-size:2.2rem;">🔤 Phonics Alphabet Stories</h1>
+    <p class="text-muted">Click any letter to learn its sound, story, and words!</p>
+    <div class="d-flex justify-content-center align-items-center gap-3 flex-wrap">
+      <div class="prog-bar" style="width:260px;"><div class="prog-fill" id="overallProg" style="width:0%;"></div></div>
+      <span id="masteredCount" class="fw-bold text-primary small">0 / 26 mastered</span>
+      <span id="totalStars" class="fw-bold" style="color:var(--dd-yellow);">⭐ 0</span>
+    </div>
+  </div>
+
+  <!-- Alphabet Grid -->
+  <div class="letter-grid mb-4" id="letterGrid"></div>
+
+  <!-- Story Panel -->
+  <div class="story-card" id="storyPanel">
+    <!-- Intro screen -->
+    <div id="introMsg" class="text-center py-5">
+      <div style="font-size:5rem;">🔤</div>
+      <h3 class="fw-black mt-3 mb-2">Choose a Letter!</h3>
+      <p class="text-muted">Tap any letter above to begin the alphabet adventure.</p>
+    </div>
+
+    <!-- Letter content -->
+    <div id="letterContent" style="display:none;">
+      <div class="row align-items-center mb-4">
+        <div class="col-auto text-center">
+          <div class="letter-hero" id="bigLetter">A</div>
+          <div class="emoji-hero" id="mainEmoji">🍎</div>
+        </div>
+        <div class="col">
+          <h2 class="fw-black mb-1" id="letterHeading">A is for Apple</h2>
+          <p class="text-muted mb-2" id="phonemeTag">Phoneme: /æ/</p>
+          <div id="starRow" class="mb-3">
+            <span class="star" id="s1">★</span>
+            <span class="star" id="s2">★</span>
+            <span class="star" id="s3">★</span>
+          </div>
+          <button class="btn btn-primary rounded-pill px-4 me-2" onclick="speakLetter()">🔊 Hear Sound</button>
+          <button class="btn btn-outline-secondary rounded-pill px-4" onclick="speakStory()">📖 Read Story</button>
+        </div>
+      </div>
+
+      <!-- Story text -->
+      <div class="alert rounded-3" style="background:#f0f4ff;border:none;font-size:1.05rem;font-weight:600;" id="storyText"></div>
+
+      <!-- Activity Tabs -->
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <button class="activity-tab active" onclick="switchTab('story')">📖 Story</button>
+        <button class="activity-tab" onclick="switchTab('match')">🎯 Sound Match</button>
+        <button class="activity-tab" onclick="switchTab('trace')">✍️ Tracing</button>
+        <button class="activity-tab" onclick="switchTab('words')">🔤 Words</button>
+      </div>
+
+      <!-- Story Tab -->
+      <div class="activity-pane active" id="pane-story">
+        <div id="storyImage" class="text-center py-3" style="font-size:4rem;"></div>
+        <p class="text-muted small text-center">Tap <strong>🔊 Hear Sound</strong> to listen to the letter sound, then <strong>📖 Read Story</strong> to hear the full story!</p>
+      </div>
+
+      <!-- Sound Match Tab -->
+      <div class="activity-pane" id="pane-match">
+        <div class="text-center mb-3">
+          <h5 class="fw-bold">Which letter makes this sound?</h5>
+          <button class="btn btn-lg btn-primary rounded-pill px-5 mb-3" onclick="playMatchSound()">🔊 Play Sound</button>
+          <p class="text-muted small">Listen carefully and choose the correct letter!</p>
+        </div>
+        <div class="row g-3" id="matchChoices"></div>
+        <div id="matchFeedback" class="text-center mt-3 fw-bold fs-5"></div>
+      </div>
+
+      <!-- Tracing Tab -->
+      <div class="activity-pane" id="pane-trace">
+        <div class="text-center mb-3">
+          <h5 class="fw-bold">Trace the letter <span id="traceLetterLabel">A</span>!</h5>
+          <p class="text-muted small">Use your finger or mouse to trace over the dotted letter</p>
+        </div>
+        <div class="text-center position-relative" style="display:inline-block;width:100%;">
+          <canvas id="traceCanvas" width="320" height="320"></canvas>
+          <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:200px;font-weight:900;opacity:0.08;pointer-events:none;line-height:1;" id="traceGuide">A</div>
+        </div>
+        <div class="d-flex justify-content-center gap-3 mt-3">
+          <button class="btn btn-outline-secondary rounded-pill px-4" onclick="clearTrace()">🗑️ Clear</button>
+          <button class="btn btn-success rounded-pill px-4" onclick="submitTrace()">✅ Done!</button>
+        </div>
+      </div>
+
+      <!-- Words Tab -->
+      <div class="activity-pane" id="pane-words">
+        <h5 class="fw-bold text-center mb-3">Words that start with <span id="wordsLetterLabel">A</span>!</h5>
+        <div class="row g-3" id="wordCards"></div>
+      </div>
+
+      <!-- Activity Complete Button -->
+      <div class="text-center mt-4">
+        <button class="btn btn-success rounded-pill px-5 py-2 fw-bold fs-5" onclick="completeLetter()">
+          ⭐ Complete Letter!
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Certificate -->
+  <div id="certificate" class="story-card text-center mt-4 d-none" style="background:linear-gradient(135deg,#fef3c7,#e0f2fe);">
+    <div style="font-size:5rem;">🏆</div>
+    <h2 class="fw-black">Congratulations!</h2>
+    <p class="fs-5 text-muted">You've completed all 26 letters of the Phonics Alphabet!</p>
+    <p class="fw-bold fs-4">⭐ Total Stars: <span id="certStars">0</span></p>
+    <button class="btn btn-primary rounded-pill px-5 mt-2" onclick="window.print()">🖨️ Print Certificate</button>
+  </div>
+
+</div>
+
+<footer class="py-4 mt-5">
+  <div class="container d-flex flex-wrap justify-content-between align-items-center gap-2 small">
+    <span>© Books at Doorsteps — Learning Zone</span>
+    <span>
+      <a href="phonics-guessing-game.html" class="text-light me-3">🎮 Guessing Game</a>
+      <a href="booksatdoorsteps_live.html" class="text-light">🏠 Home</a>
+    </span>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ============ CONFIG ============ */
+const SUPABASE_URL = "https://ebmzkpcujwwnqagbthby.supabase.co";
+const SUPABASE_KEY = "sb_publishable_mPwZfvEi6rZJ_TEHJ-qlUw_uxLpeZWZ";
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+/* ============ PHONICS DATA ============ */
+const ALPHABET = [
+  { letter:"A", phoneme:"/æ/", emoji:"🍎", heading:"A is for Apple",
+    story:"A says /æ/! Apple starts with A. Ants also start with A. An ant ate an apple under an amazing oak tree!",
+    words:[{w:"Apple",e:"🍎"},{w:"Ant",e:"🐜"},{w:"Alligator",e:"🐊"},{w:"Arrow",e:"🏹"}] },
+  { letter:"B", phoneme:"/b/", emoji:"🎈", heading:"B is for Ball",
+    story:"B says /b/! Ball starts with B. Bees buzz and butterflies float. A bear bounced a big blue ball!",
+    words:[{w:"Ball",e:"⚽"},{w:"Bear",e:"🐻"},{w:"Bee",e:"🐝"},{w:"Boat",e:"⛵"}] },
+  { letter:"C", phoneme:"/k/", emoji:"🐱", heading:"C is for Cat",
+    story:"C says /k/! Cat starts with C. Cows, camels and crocodiles all start with C. A cute cat caught a colourful butterfly!",
+    words:[{w:"Cat",e:"🐱"},{w:"Cow",e:"🐄"},{w:"Car",e:"🚗"},{w:"Cake",e:"🎂"}] },
+  { letter:"D", phoneme:"/d/", emoji:"🐶", heading:"D is for Dog",
+    story:"D says /d/! Dog starts with D. Ducks quack by the door. A delightful dog danced in the rain!",
+    words:[{w:"Dog",e:"🐶"},{w:"Duck",e:"🦆"},{w:"Door",e:"🚪"},{w:"Drum",e:"🥁"}] },
+  { letter:"E", phoneme:"/ɛ/", emoji:"🐘", heading:"E is for Elephant",
+    story:"E says /ɛ/! Elephant starts with E. Eagles soar and eggs hatch. An enormous elephant ate eleven eggs!",
+    words:[{w:"Elephant",e:"🐘"},{w:"Eagle",e:"🦅"},{w:"Egg",e:"🥚"},{w:"Envelope",e:"✉️"}] },
+  { letter:"F", phoneme:"/f/", emoji:"🐟", heading:"F is for Fish",
+    story:"F says /f/! Fish starts with F. Frogs leap and flowers bloom. A friendly fish swam under a fantastic waterfall!",
+    words:[{w:"Fish",e:"🐟"},{w:"Frog",e:"🐸"},{w:"Flower",e:"🌸"},{w:"Fire",e:"🔥"}] },
+  { letter:"G", phoneme:"/g/", emoji:"🦒", heading:"G is for Giraffe",
+    story:"G says /g/! Giraffe starts with G. Goats and gorillas gallop on green grass. A great giraffe grabbed grapes!",
+    words:[{w:"Giraffe",e:"🦒"},{w:"Goat",e:"🐐"},{w:"Grapes",e:"🍇"},{w:"Guitar",e:"🎸"}] },
+  { letter:"H", phoneme:"/h/", emoji:"🐎", heading:"H is for Horse",
+    story:"H says /h/! Horse starts with H. Hippos and hens say hello. A happy horse hopped over a huge hill!",
+    words:[{w:"Horse",e:"🐎"},{w:"Hen",e:"🐔"},{w:"Hat",e:"🎩"},{w:"Heart",e:"❤️"}] },
+  { letter:"I", phoneme:"/ɪ/", emoji:"🍦", heading:"I is for Ice Cream",
+    story:"I says /ɪ/! Ice cream starts with I. Iguanas look interested. An iguana ate icy ice cream on an island!",
+    words:[{w:"Ice Cream",e:"🍦"},{w:"Iguana",e:"🦎"},{w:"Island",e:"🏝️"},{w:"Insect",e:"🐛"}] },
+  { letter:"J", phoneme:"/dʒ/", emoji:"🃏", heading:"J is for Jaguar",
+    story:"J says /dʒ/! Jaguar starts with J. Jellyfish jump and jam jars jingle. A jolly jaguar juggled jars of jam!",
+    words:[{w:"Jaguar",e:"🐆"},{w:"Jar",e:"🫙"},{w:"Jellyfish",e:"🪼"},{w:"Juice",e:"🧃"}] },
+  { letter:"K", phoneme:"/k/", emoji:"🦘", heading:"K is for Kangaroo",
+    story:"K says /k/! Kangaroo starts with K. Keys click and kites fly. A kind kangaroo kept keys in her big pocket!",
+    words:[{w:"Kangaroo",e:"🦘"},{w:"Key",e:"🔑"},{w:"Kite",e:"🪁"},{w:"King",e:"👑"}] },
+  { letter:"L", phoneme:"/l/", emoji:"🦁", heading:"L is for Lion",
+    story:"L says /l/! Lion starts with L. Lambs leap and lollipops are lovely. A lucky lion licked a lemon lollipop!",
+    words:[{w:"Lion",e:"🦁"},{w:"Lemon",e:"🍋"},{w:"Leaf",e:"🍃"},{w:"Lamp",e:"💡"}] },
+  { letter:"M", phoneme:"/m/", emoji:"🐒", heading:"M is for Monkey",
+    story:"M says /m/! Monkey starts with M. Mice munch mango and mountains are mighty. A merry monkey made marvellous music!",
+    words:[{w:"Monkey",e:"🐒"},{w:"Moon",e:"🌙"},{w:"Mango",e:"🥭"},{w:"Mushroom",e:"🍄"}] },
+  { letter:"N", phoneme:"/n/", emoji:"🐦", heading:"N is for Nest",
+    story:"N says /n/! Nest starts with N. Nightingales sing and noodles are nice. A neat nightingale built a nice nest in November!",
+    words:[{w:"Nest",e:"🪹"},{w:"Needle",e:"🪡"},{w:"Nut",e:"🥜"},{w:"Night",e:"🌃"}] },
+  { letter:"O", phoneme:"/ɒ/", emoji:"🦦", heading:"O is for Otter",
+    story:"O says /ɒ/! Otter starts with O. Owls hoot at odd hours. An orange otter opened an oak door with an old key!",
+    words:[{w:"Otter",e:"🦦"},{w:"Owl",e:"🦉"},{w:"Orange",e:"🍊"},{w:"Ocean",e:"🌊"}] },
+  { letter:"P", phoneme:"/p/", emoji:"🐷", heading:"P is for Pig",
+    story:"P says /p/! Pig starts with P. Penguins play and peaches are pink. A playful pig painted pretty purple pictures!",
+    words:[{w:"Pig",e:"🐷"},{w:"Penguin",e:"🐧"},{w:"Pizza",e:"🍕"},{w:"Parrot",e:"🦜"}] },
+  { letter:"Q", phoneme:"/kw/", emoji:"👸", heading:"Q is for Queen",
+    story:"Q says /kw/! Queen starts with Q. Quails are quite quiet. A quick queen queued up to eat quince jam on a quiet quest!",
+    words:[{w:"Queen",e:"👸"},{w:"Quail",e:"🐦"},{w:"Question",e:"❓"},{w:"Quilt",e:"🛏️"}] },
+  { letter:"R", phoneme:"/r/", emoji:"🦝", heading:"R is for Rabbit",
+    story:"R says /r/! Rabbit starts with R. Rainbows are radiant and roses are red. A red rabbit raced rapidly across a rosy rainbow!",
+    words:[{w:"Rabbit",e:"🐰"},{w:"Rainbow",e:"🌈"},{w:"Rose",e:"🌹"},{w:"Robot",e:"🤖"}] },
+  { letter:"S", phoneme:"/s/", emoji:"🐍", heading:"S is for Snake",
+    story:"S says /s/! Snake starts with S. Stars shine and sunflowers sway. A slippery snake slid softly through the sunny sand!",
+    words:[{w:"Snake",e:"🐍"},{w:"Sun",e:"☀️"},{w:"Star",e:"⭐"},{w:"Strawberry",e:"🍓"}] },
+  { letter:"T", phoneme:"/t/", emoji:"🐯", heading:"T is for Tiger",
+    story:"T says /t/! Tiger starts with T. Trees are tall and turtles are tiny. A terrific tiger tossed ten tiny tomatoes into a tree!",
+    words:[{w:"Tiger",e:"🐯"},{w:"Tree",e:"🌳"},{w:"Train",e:"🚂"},{w:"Turtle",e:"🐢"}] },
+  { letter:"U", phoneme:"/ʌ/", emoji:"☂️", heading:"U is for Umbrella",
+    story:"U says /ʌ/! Umbrella starts with U. Unicorns are unique and underpants are unusual. An uncle used an umbrella under an ugly storm!",
+    words:[{w:"Umbrella",e:"☂️"},{w:"Unicorn",e:"🦄"},{w:"Uncle",e:"👨"},{w:"Ukulele",e:"🪕"}] },
+  { letter:"V", phoneme:"/v/", emoji:"🌋", heading:"V is for Volcano",
+    story:"V says /v/! Volcano starts with V. Violins vibrate and vines are vivid. A very brave villager visited a vast, violent volcano!",
+    words:[{w:"Volcano",e:"🌋"},{w:"Violin",e:"🎻"},{w:"Van",e:"🚐"},{w:"Vegetables",e:"🥦"}] },
+  { letter:"W", phoneme:"/w/", emoji:"🐋", heading:"W is for Whale",
+    story:"W says /w/! Whale starts with W. Wolves howl and waterfalls are wide. A wonderful whale watched the world from warm waters!",
+    words:[{w:"Whale",e:"🐋"},{w:"Wolf",e:"🐺"},{w:"Waterfall",e:"💧"},{w:"Worm",e:"🪱"}] },
+  { letter:"X", phoneme:"/ks/", emoji:"🎸", heading:"X is for Xylophone",
+    story:"X says /ks/! Xylophone starts with X. X-rays show our bones. A fox played a xylophone and six foxes danced to the excellent music!",
+    words:[{w:"Xylophone",e:"🎵"},{w:"X-ray",e:"🩻"},{w:"Fox",e:"🦊"},{w:"Box",e:"📦"}] },
+  { letter:"Y", phoneme:"/j/", emoji:"🧶", heading:"Y is for Yarn",
+    story:"Y says /j/! Yarn starts with Y. Yaks yawn and yachts sail. A yellow yak yelled yes while playing with yards of yummy yellow yarn!",
+    words:[{w:"Yarn",e:"🧶"},{w:"Yak",e:"🐃"},{w:"Yacht",e:"⛵"},{w:"Yoghurt",e:"🥛"}] },
+  { letter:"Z", phoneme:"/z/", emoji:"🦓", heading:"Z is for Zebra",
+    story:"Z says /z/! Zebra starts with Z. Zoos are full of amazing animals. A zippy zebra zoomed past a zany zoo and zapped a buzzing bee!",
+    words:[{w:"Zebra",e:"🦓"},{w:"Zoo",e:"🦁"},{w:"Zero",e:"0️⃣"},{w:"Zip",e:"🤐"}] },
+];
+
+/* ============ STATE ============ */
+let currentLetterIdx = null;
+let progress = {}; // { A: { stars: 0, done: false }, ... }
+let currentUser = null;
+let matchAnswer = null;
+let traceDrawing = false;
+let traceLastX = 0, traceLastY = 0;
+
+/* ============ SUPABASE AUTH ============ */
+async function initAuth() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    currentUser = session.user;
+    document.getElementById("userBadge").textContent = "👤 " + (currentUser.email || "Student");
+    document.getElementById("userBadge").classList.remove("d-none");
+    await loadProgress();
+  } else {
+    document.getElementById("loginGate").classList.remove("d-none");
+  }
+}
+
+async function loadProgress() {
+  if (!currentUser) return;
+  try {
+    const { data } = await sb.from("student_progress")
+      .select("letter, stars, mastered")
+      .eq("user_id", currentUser.id)
+      .eq("game_type", "phonics_stories");
+    if (data) {
+      data.forEach(r => { progress[r.letter] = { stars: r.stars || 0, done: r.mastered }; });
+      updateProgressUI();
+    }
+  } catch (e) { /* progress not saved yet */ }
+}
+
+async function saveProgress(letter, stars) {
+  if (!currentUser) return;
+  try {
+    await sb.from("student_progress").upsert({
+      user_id: currentUser.id,
+      game_type: "phonics_stories",
+      letter: letter,
+      stars: stars,
+      mastered: stars >= 1,
+      updated_at: new Date().toISOString()
+    }, { onConflict: "user_id,game_type,letter" });
+  } catch (e) { /* silent fail if table doesn't exist yet */ }
+}
+
+/* ============ GRID ============ */
+function buildGrid() {
+  const grid = document.getElementById("letterGrid");
+  grid.innerHTML = "";
+  ALPHABET.forEach((d, i) => {
+    const p = progress[d.letter] || { stars: 0, done: false };
+    const btn = document.createElement("button");
+    btn.className = "letter-btn" + (p.done ? " mastered" : "") + (i === currentLetterIdx ? " current" : "");
+    btn.innerHTML = `<span>${d.letter}</span><span class="star-row">${"★".repeat(p.stars)}${"☆".repeat(3 - p.stars)}</span>`;
+    btn.onclick = () => openLetter(i);
+    grid.appendChild(btn);
+  });
+}
+
+/* ============ OPEN LETTER ============ */
+function openLetter(idx) {
+  currentLetterIdx = idx;
+  const d = ALPHABET[idx];
+  const p = progress[d.letter] || { stars: 0, done: false };
+
+  document.getElementById("introMsg").style.display = "none";
+  document.getElementById("letterContent").style.display = "block";
+
+  document.getElementById("bigLetter").textContent = d.letter;
+  document.getElementById("mainEmoji").textContent = d.emoji;
+  document.getElementById("letterHeading").textContent = d.heading;
+  document.getElementById("phonemeTag").textContent = "Phoneme: " + d.phoneme;
+  document.getElementById("storyText").textContent = d.story;
+  document.getElementById("storyImage").textContent = d.emoji;
+  document.getElementById("traceGuide").textContent = d.letter;
+  document.getElementById("traceLetterLabel").textContent = d.letter;
+  document.getElementById("wordsLetterLabel").textContent = d.letter;
+
+  updateStarDisplay(p.stars);
+  buildMatchActivity(idx);
+  buildWordCards(d);
+  clearTrace();
+  switchTab("story");
+  buildGrid();
+
+  document.getElementById("storyPanel").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+/* ============ STAR DISPLAY ============ */
+function updateStarDisplay(stars) {
+  for (let i = 1; i <= 3; i++) {
+    const el = document.getElementById("s" + i);
+    el.className = "star" + (i <= stars ? " earned" : "");
+  }
+}
+
+/* ============ SPEECH ============ */
+function speak(text) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.rate = 0.85;
+  utt.pitch = 1.2;
+  window.speechSynthesis.speak(utt);
+}
+
+function speakLetter() {
+  const d = ALPHABET[currentLetterIdx];
+  speak(d.letter + " says " + d.phoneme + ". " + d.heading);
+}
+
+function speakStory() {
+  const d = ALPHABET[currentLetterIdx];
+  speak(d.story);
+}
+
+/* ============ TABS ============ */
+function switchTab(name) {
+  document.querySelectorAll(".activity-tab").forEach((t, i) => {
+    const names = ["story","match","trace","words"];
+    t.className = "activity-tab" + (names[i] === name ? " active" : "");
+  });
+  document.querySelectorAll(".activity-pane").forEach(p => p.className = "activity-pane");
+  document.getElementById("pane-" + name).className = "activity-pane active";
+}
+
+/* ============ SOUND MATCH ============ */
+function buildMatchActivity(idx) {
+  const correctIdx = idx;
+  const pool = [...ALPHABET];
+  const distractors = pool.filter((_, i) => i !== idx);
+  const shuffled = distractors.sort(() => Math.random() - 0.5).slice(0, 3);
+  const choices = [...shuffled, ALPHABET[correctIdx]].sort(() => Math.random() - 0.5);
+  matchAnswer = ALPHABET[correctIdx].letter;
+
+  const container = document.getElementById("matchChoices");
+  container.innerHTML = "";
+  choices.forEach(c => {
+    const col = document.createElement("div");
+    col.className = "col-6 col-md-3";
+    col.innerHTML = `<button class="choice-btn" onclick="checkMatch('${c.letter}', this)">${c.letter}<br><small style="font-size:1rem">${c.emoji}</small></button>`;
+    container.appendChild(col);
+  });
+  document.getElementById("matchFeedback").textContent = "";
+}
+
+function playMatchSound() {
+  const d = ALPHABET[currentLetterIdx];
+  speak(d.letter + "... " + d.letter + "... " + d.phoneme);
+}
+
+function checkMatch(chosen, btn) {
+  const fb = document.getElementById("matchFeedback");
+  document.querySelectorAll(".choice-btn").forEach(b => b.disabled = true);
+  if (chosen === matchAnswer) {
+    btn.classList.add("correct");
+    fb.innerHTML = "🎉 Correct! <strong>" + chosen + "</strong> is right!";
+    fb.style.color = "#15803d";
+    speak("Correct! Well done!");
+    awardStar();
+  } else {
+    btn.classList.add("wrong");
+    fb.innerHTML = "❌ Try again! The answer is <strong>" + matchAnswer + "</strong>";
+    fb.style.color = "#b91c1c";
+    speak("Not quite. The answer is " + matchAnswer);
+    document.querySelectorAll(".choice-btn").forEach(b => {
+      if (b.textContent.startsWith(matchAnswer)) b.classList.add("correct");
+    });
+  }
+  setTimeout(() => {
+    document.querySelectorAll(".choice-btn").forEach(b => {
+      b.disabled = false;
+      b.className = "choice-btn";
+    });
+    fb.textContent = "";
+    buildMatchActivity(currentLetterIdx);
+  }, 2500);
+}
+
+/* ============ TRACING ============ */
+function initTrace() {
+  const canvas = document.getElementById("traceCanvas");
+  const ctx = canvas.getContext("2d");
+  ctx.strokeStyle = "#4f46e5";
+  ctx.lineWidth = 6;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+
+  function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const src = e.touches ? e.touches[0] : e;
+    return { x: (src.clientX - rect.left) * scaleX, y: (src.clientY - rect.top) * scaleY };
+  }
+
+  canvas.addEventListener("mousedown", e => { traceDrawing = true; const p = getPos(e); traceLastX = p.x; traceLastY = p.y; });
+  canvas.addEventListener("mousemove", e => {
+    if (!traceDrawing) return;
+    const p = getPos(e);
+    ctx.beginPath(); ctx.moveTo(traceLastX, traceLastY); ctx.lineTo(p.x, p.y); ctx.stroke();
+    traceLastX = p.x; traceLastY = p.y;
+  });
+  canvas.addEventListener("mouseup", () => { traceDrawing = false; });
+  canvas.addEventListener("touchstart", e => { e.preventDefault(); traceDrawing = true; const p = getPos(e); traceLastX = p.x; traceLastY = p.y; });
+  canvas.addEventListener("touchmove", e => {
+    e.preventDefault();
+    if (!traceDrawing) return;
+    const p = getPos(e);
+    ctx.beginPath(); ctx.moveTo(traceLastX, traceLastY); ctx.lineTo(p.x, p.y); ctx.stroke();
+    traceLastX = p.x; traceLastY = p.y;
+  });
+  canvas.addEventListener("touchend", () => { traceDrawing = false; });
+}
+
+function clearTrace() {
+  const canvas = document.getElementById("traceCanvas");
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function submitTrace() {
+  speak("Great tracing! Well done!");
+  awardStar();
+  const fb = document.createElement("div");
+  fb.className = "alert alert-success rounded-3 mt-3 text-center fw-bold";
+  fb.textContent = "🌟 Great job tracing the letter!";
+  const pane = document.getElementById("pane-trace");
+  const existing = pane.querySelector(".alert");
+  if (existing) existing.remove();
+  pane.appendChild(fb);
+  setTimeout(() => fb.remove(), 2500);
+}
+
+/* ============ WORD CARDS ============ */
+function buildWordCards(d) {
+  const container = document.getElementById("wordCards");
+  container.innerHTML = "";
+  d.words.forEach(w => {
+    const col = document.createElement("div");
+    col.className = "col-6 col-md-3";
+    const highlighted = `<span class="word-highlight">${w.w[0]}</span>${w.w.slice(1)}`;
+    col.innerHTML = `<div class="word-card" onclick="speakWord('${w.w}')">
+      <div class="word-emoji">${w.e}</div>
+      <div class="word-text">${highlighted}</div>
+    </div>`;
+    container.appendChild(col);
+  });
+}
+
+function speakWord(word) {
+  speak(word + " starts with " + word[0]);
+}
+
+/* ============ STARS & PROGRESS ============ */
+function awardStar() {
+  if (currentLetterIdx === null) return;
+  const letter = ALPHABET[currentLetterIdx].letter;
+  if (!progress[letter]) progress[letter] = { stars: 0, done: false };
+  if (progress[letter].stars < 3) {
+    progress[letter].stars++;
+    updateStarDisplay(progress[letter].stars);
+    saveProgress(letter, progress[letter].stars);
+  }
+}
+
+function completeLetter() {
+  if (currentLetterIdx === null) return;
+  const letter = ALPHABET[currentLetterIdx].letter;
+  if (!progress[letter]) progress[letter] = { stars: 0, done: false };
+  if (progress[letter].stars < 1) progress[letter].stars = 1;
+  progress[letter].done = true;
+  saveProgress(letter, progress[letter].stars);
+  updateProgressUI();
+  buildGrid();
+  celebrate();
+  speak("Amazing! You completed the letter " + letter + "!");
+}
+
+function updateProgressUI() {
+  const mastered = Object.values(progress).filter(p => p.done).length;
+  const totalStarsCount = Object.values(progress).reduce((s, p) => s + (p.stars || 0), 0);
+  document.getElementById("masteredCount").textContent = mastered + " / 26 mastered";
+  document.getElementById("overallProg").style.width = (mastered / 26 * 100) + "%";
+  document.getElementById("totalStars").textContent = "⭐ " + totalStarsCount;
+  if (mastered === 26) {
+    document.getElementById("certificate").classList.remove("d-none");
+    document.getElementById("certStars").textContent = totalStarsCount;
+  }
+}
+
+/* ============ CONFETTI ============ */
+function celebrate() {
+  const div = document.getElementById("celebrateDiv");
+  const canvas = document.getElementById("confetti");
+  div.style.display = "block";
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const ctx = canvas.getContext("2d");
+  const pieces = Array.from({ length: 80 }, () => ({
+    x: Math.random() * canvas.width, y: -20,
+    r: Math.random() * 8 + 4,
+    d: Math.random() * 5 + 2,
+    color: ["#4f46e5","#fb7185","#facc15","#22c55e","#f97316"][Math.floor(Math.random()*5)],
+    tilt: Math.random() * 10 - 5, tiltAngle: 0, tiltAngleIncremental: Math.random() * 0.07 + 0.05
+  }));
+  let frame = 0;
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    pieces.forEach(p => {
+      ctx.beginPath(); ctx.fillStyle = p.color;
+      ctx.ellipse(p.x, p.y, p.r, p.r / 2, p.tilt * Math.PI / 180, 0, 2 * Math.PI);
+      ctx.fill();
+      p.y += p.d; p.tiltAngle += p.tiltAngleIncremental; p.tilt = Math.sin(p.tiltAngle) * 12;
+      p.x += Math.sin(p.tiltAngle) * 0.5;
+    });
+    frame++;
+    if (frame < 120) requestAnimationFrame(draw);
+    else { ctx.clearRect(0, 0, canvas.width, canvas.height); div.style.display = "none"; }
+  }
+  draw();
+}
+
+/* ============ INIT ============ */
+window.addEventListener("DOMContentLoaded", () => {
+  buildGrid();
+  initTrace();
+  initAuth();
+});
+</script>
+</body>
+</html>
